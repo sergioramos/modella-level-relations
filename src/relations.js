@@ -1,12 +1,21 @@
 var path = require('level-path'),
     interpolate = require('util').format,
     timehat = require('timehat'),
-    through = require('through')
+    through = require('ordered-through'),
+    type = require('type-component'),
+    xtend = require('xtend')
 
 var encoding = {
   keyEncoding: 'utf8',
   valueEncoding: 'json'
 }
+
+var default_read_opts = xtend(encoding, {
+  start: '',
+  end: '',
+  limit: -1,
+  reverse: true
+})
 
 //add count
 var get_pk = function (value) {
@@ -25,25 +34,24 @@ var get = function (paths, relation, model, attr) {
     if(!from)
       return new Error('relation origin not found')
 
-    if(last && !qt)
-      qt = 100
+    opts = xtend(default_read_opts, opts)
 
-    paths.from({attr: attr, from: get_pk(from[relation.from])})
-
-    var stream = model.db.createValueStream({
-      keyEncoding: 'utf8',
-      valueEncoding: 'json',
-      start: paths.from({attr: attr, from: get_pk(from[relation.from])})
+    var range = paths.from.range({
+      attr: attr,
+      from: get_pk(from[relation.from]),
+      end: opts.end,
+      start: opts.start,
+      reverse: opts.reverse
     })
 
-    return stream.pipe(through(function (data) {
-      var self = this;
+    opts.start = range.start
+    opts.end = range.end
 
-      model.get(data.to, encoding, function (err, to) {
-        if(err)
-          return self.emit('error', err)
-
-        this.emit('data', to)
+    return model.db.createValueStream(opts).pipe(through(function (rel, fn) {
+      model.get(rel.to, encoding, function (err, to) {
+        if(err) return fn(err)
+        to.__relation = rel.id;
+        fn(null, to)
       })
     }))
   }
@@ -183,9 +191,9 @@ var count = function (paths, relation, model, attr) {
 
 module.exports = function (model) {
   var paths = {
-    from: path(interpolate('/relation/%s/:attr/:from', model.modelName)),
-    count: path(interpolate('/count/%s/:attr/:from', model.modelName)),
-    from_to: path(interpolate('/relation/%s/:attr/:from/:to', model.modelName))
+    from: path(interpolate('/relation/from/%s/:attr/:from/:id', model.modelName)),
+    count: path(interpolate('/relation/count/%s/:attr/:from', model.modelName)),
+    from_to: path(interpolate('/relation/from_to/%s/:attr/:from/:to', model.modelName))
   }
 
   model.relations = {}
@@ -193,7 +201,7 @@ module.exports = function (model) {
   model.relation = function (attr) {
     var options = model.attrs[attr]
 
-    if(!options || !options.is) return
+    if(!options || !options.is)
       throw new Error('no relation is defined')
 
     if(!model.primaryKey || !options.is.primaryKey)

@@ -2,7 +2,13 @@
   "name": "modella-level-relations",
   "version": "0.0.1",
   "description": "levelup based modella relations",
-  "keywords": ["modella", "level", "relations", "relation", "levelup"],
+  "keywords": [
+    "modella",
+    "level",
+    "relations",
+    "relation",
+    "levelup"
+  ],
   "homepage": "https://github.com/ramitos/modella-level-relations",
   "bugs": {
     "url": "http://github.com/ramitos/modella-level-relations/issues",
@@ -26,8 +32,10 @@
   },
   "dependencies": {
     "level-path": "0.0.x",
-    "through": "2.3.x",
-    "timehat": "0.0.x"
+    "ordered-through": "0.0.x",
+    "timehat": "0.0.x",
+    "xtend": "~2.1.1",
+    "type-component": "0.0.1"
   },
   "devDependencies": {
     "mocha-lcov-reporter": "0.0.x",
@@ -35,11 +43,11 @@
     "coveralls": "2.0.x",
     "mocha": "1.10.x",
     "level-cursor": "0.5.x",
-    "map-series": "0.0.x"
-  },
-  "peerDependencies": {
+    "map-series": "0.0.x",
     "modella": "0.2.x",
-    "modella-leveldb": "modella/leveldb"
+    "modella-leveldb": "ramitos/leveldb",
+    "leveldown": "0.10.x",
+    "mkdirp": "0.3.x"
   },
   "engines": {
     "node": ">=0.8"

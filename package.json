@@ -40,8 +40,8 @@
   "devDependencies": {
     "mocha-lcov-reporter": "0.0.x",
     "jscoverage": "0.3.x",
-    "coveralls": "2.0.x",
-    "mocha": "1.10.x",
+    "coveralls": "2.5.x",
+    "mocha": "1.14.x",
     "level-cursor": "0.5.x",
     "map-series": "0.0.x",
     "modella": "0.2.x",

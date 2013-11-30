@@ -4,6 +4,7 @@ var relations = process.env.RELATIONS_COV ? require('../lib-cov/relations') : re
     mkdirp = require('mkdirp'),
     cursor = require('level-cursor'),
     leveldown = require('leveldown'),
+    type = require('type-component'),
     level = require('modella-leveldb'),
     assert = require('assert'),
     utils = require('./utils'),
@@ -31,7 +32,7 @@ beforeEach(function () {
   User.attr('id')
   User.attr('name')
   User.attr('username')
-  User.attr('password')
+  User.attr('password', {required: true})
   User.attr('birthdate')
   User.attr('gender')
   User.attr('followers', {is: User})
@@ -47,6 +48,87 @@ afterEach(function (done) {
   })
 })
 
+describe('relation', function () {
+  it('should throw when relation called on attrs without options', function () {
+    try {
+      User.relation('name')
+    } catch (err) {
+      return assert(err && err.message === 'no relation is defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when relation called on attrs without relation', function () {
+    try {
+      User.relation('password')
+    } catch (err) {
+      return assert(err && err.message === 'no relation is defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when relation origin has no PK', function () {
+    var Todo = modella('Todo')
+    Todo.use(relations)
+    Todo.attr('author', {is: User})
+
+    try {
+      Todo.relation('author')
+    } catch (err) {
+      return assert(err && err.message === 'both ends of the relation need to have a Primary Key')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when relation destiny has no PK', function () {
+    var Todo = modella('Todo')
+    Todo.use(relations)
+    Todo.attr('author', {is: User})
+
+    var Work = modella('Work')
+    Work.use(relations)
+    Work.attr('id')
+    Work.attr('todos', {is: Todo})
+
+    try {
+      Work.relation('todos')
+    } catch (err) {
+      return assert(err && err.message === 'both ends of the relation need to have a Primary Key')
+    }
+
+    assert(false)
+  })
+
+  it('should return get', function () {
+    var relation = User.relation('followers')
+    assert(type(relation.get) === 'function')
+  })
+
+  it('should return put', function () {
+    var relation = User.relation('followers')
+    assert(type(relation.put) === 'function')
+  })
+
+  it('should return del', function () {
+    var relation = User.relation('followers')
+    assert(type(relation.del) === 'function')
+  })
+
+  it('should return count', function () {
+    var relation = User.relation('followers')
+    assert(type(relation.count) === 'function')
+  })
+
+  it('should return the correct amount of methods', function () {
+    var relation = User.relation('followers')
+    assert(Object.keys(relation).length === 4)
+  })
+})
+
+
 
 describe('get', function () {
   var relations = []
@@ -59,7 +141,7 @@ describe('get', function () {
     })
   })
 
-  it('get all', function (done) {
+  it('should get all', function (done) {
     var all = relations.filter(function (rel) {
       return rel.from.id === 1
     })
@@ -80,7 +162,7 @@ describe('get', function () {
     })
   })
 
-  it('get first', function (done) {
+  it('should get first', function (done) {
     var all = relations.filter(function (rel) {
       return rel.from.id === 1
     })
@@ -99,7 +181,7 @@ describe('get', function () {
     })
   })
 
-  it('get from second', function (done) {
+  it('should get from second', function (done) {
     var all = relations.filter(function (rel) {
       return rel.from.id === 1
     })
@@ -126,7 +208,7 @@ describe('get', function () {
     })
   })
 
-  it('get not reversed', function (done) {
+  it('should get not reversed', function (done) {
     var all = relations.filter(function (rel) {
       return rel.from.id === 1
     })
@@ -150,42 +232,14 @@ describe('get', function () {
       done()
     })
   })
+
+  it('should throw when no origin is defined', function () {
+    try {
+      User.relation('followers').get()
+    } catch (err) {
+      return assert(err && err.message === 'relation origin not defined')
+    }
+
+    assert(false)
+  })
 })
-
-
-//
-
-// series(users, function (user, fn) {
-//   new User(user).save(fn)
-// }, function (err, users) {
-//   series()
-//   User.relation('followers').put()
-//   // User.relation('followers').put(john, hank, function (err) {
-//
-//   //
-//   // })
-//
-//   users
-//   console.log(err, )
-// })
-//
-// //
-// // var john = User.get(1)
-// // var hank = User.get(2)
-// //
-//
-// // User.relation('followers').put({
-// //   id: 1
-// // }, {
-// //   id: 2
-// // }, function (err) {
-// //   if(err) return done(err)
-// //   User.relation('followers').get({
-// //     id: 1
-// //   })
-// //   // cursor().each(function() {
-// //   //   console.log(arguments)
-// //   // }, function() {
-// //   //   console.log(arguments)
-// //   // })
-// // })

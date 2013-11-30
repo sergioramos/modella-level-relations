@@ -29,10 +29,8 @@ var get_pk = function (value) {
 
 var get = function (paths, relation, model, attr) {
   return function (from, opts) {
-    if(!relation)
-      return new Error('relation not found')
     if(!from)
-      return new Error('relation origin not found')
+      throw new Error('relation origin not defined')
 
     opts = xtend(default_read_opts, opts)
 
@@ -59,8 +57,6 @@ var get = function (paths, relation, model, attr) {
 
 var put = function (paths, relation, model, attr) {
   return function (from, to, fn) {
-    if(!relation)
-      return fn(new Error('relation not found'))
     if(!from)
       return fn(new Error('relation origin not found'))
     if(!to)
@@ -121,8 +117,6 @@ var put = function (paths, relation, model, attr) {
 
 var del = function (paths, relation, model, attr) {
   return function (from, to, fn) {
-    if(!relation)
-      return fn(new Error('relation not found'))
     if(!from)
       return fn(new Error('relation origin not found'))
     if(!to)

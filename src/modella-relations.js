@@ -160,21 +160,21 @@ module.exports = function (model) {
     from_to: path(interpolate('/relation/%s/:attr/:from/:to', model.modelName))
   }
 
-  var on_attr = function (attr, options) {
+  model.relations = {}
+
+  model.relation = function (attr) {
+    var options = model.attrs[attr]
+
     if(!options || !options.is) return
+      throw new Error('no relation is defined')
+
     if(!model.primaryKey || !options.is.primaryKey)
       throw new Error('both ends of the relation need to have a Primary Key')
 
-    model.relations[attr] = {
+    var relation = model.relations[attr] = model.relations[attr] = {
       from: model.primaryKey,
       to: options.is.primaryKey
     }
-  }
-
-  model.relations = {}
-
-  model.relation = function(attr) {
-    var relation = model.relations[attr]
 
     return {
       get: get(paths, relation, model, attr),
@@ -183,10 +183,4 @@ module.exports = function (model) {
       count: count(paths, relation, model, attr)
     }
   }
-
-  model.on('attr', on_attr)
-
-  Object.keys(model.attrs).forEach(function (attr) {
-    on_attr(attr, model.attrs[attr])
-  })
 }

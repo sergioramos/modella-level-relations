@@ -243,3 +243,68 @@ describe('get', function () {
     assert(false)
   })
 })
+
+describe('count', function () {
+  var relations = []
+
+  beforeEach(function (done) {
+    utils.generate_random_rels(User, users, 'followers', function (err, rels) {
+      if(err) return done(err)
+      relations = rels
+      done()
+    })
+  })
+
+  it('should be accurate', function (done) {
+    var expected = relations.filter(function (rel) {
+      return rel.from.id === 1
+    }).length
+
+    User.relation('followers').count(users[0], function (err, count) {
+      if(err) return done(err)
+
+      assert(count === expected)
+
+      done()
+    })
+  })
+
+  it('should increment', function (done) {
+    var prev = relations.filter(function (rel) {
+      return rel.from.id === 2
+    }).length
+
+    User.relation('followers').put(users[1], {
+      name: 'alex',
+      id: 7
+    }, function (err) {
+      if(err) return done(err)
+
+      User.relation('followers').count(users[1], function (err, count) {
+        if(err) return done(err)
+
+        assert(count === (prev + 1))
+
+        done()
+      })
+    })
+  })
+
+  it('should decrement', function (done) {
+    var all = relations.filter(function (rel) {
+      return rel.from.id === 3
+    })
+
+    User.relation('followers').del(users[2], all[0].to, function (err) {
+      if(err) return done(err)
+
+      User.relation('followers').count(users[2], function (err, count) {
+        if(err) return done(err)
+
+        assert(count === (all.length - 1))
+
+        done()
+      })
+    })
+  })
+})

@@ -126,7 +126,9 @@ var del = function (paths, relation, model, attr) {
 
     from = get_pk(from[relation.from])
     to = get_pk(to[relation.to])
-    var keys = {}
+    var keys = {
+      from_to: paths.from_to({attr: attr, from: from, to: to})
+    }
 
     // get the count of relations of `from`
     var on_count = function (err, count) {
@@ -152,11 +154,8 @@ var del = function (paths, relation, model, attr) {
       if(err && err.type !== 'NotFoundError')
         return fn(err)
 
-      keys = {
-        from: paths.from({attr: attr, from: from, id: rel.id}),
-        count: paths.count({attr: attr, from: from}),
-        from_to: paths.from_to({attr: attr, from: from, to: to})
-      }
+      keys.from = paths.from({attr: attr, from: from, id: rel.id})
+      keys.count = paths.count({attr: attr, from: from, to: to})
 
       model.db.get(keys.count, encoding, on_count)
     }

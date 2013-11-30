@@ -19,9 +19,16 @@ var get_pk = function (value) {
 }
 
 var get = function (paths, relation, model, attr) {
-  return function (from) {
-    if(!relation) return new Error('relation not found')
-    if(!from) return new Error('relation origin not found')
+  return function (from, opts) {
+    if(!relation)
+      return new Error('relation not found')
+    if(!from)
+      return new Error('relation origin not found')
+
+    if(last && !qt)
+      qt = 100
+
+    paths.from({attr: attr, from: get_pk(from[relation.from])})
 
     var stream = model.db.createValueStream({
       keyEncoding: 'utf8',
@@ -33,7 +40,9 @@ var get = function (paths, relation, model, attr) {
       var self = this;
 
       model.get(data.to, encoding, function (err, to) {
-        if(err) return self.emit('error', err)
+        if(err)
+          return self.emit('error', err)
+
         this.emit('data', to)
       })
     }))
@@ -42,10 +51,14 @@ var get = function (paths, relation, model, attr) {
 
 var put = function (paths, relation, model, attr) {
   return function (from, to, fn) {
-    if(!relation) return fn(new Error('relation not found'))
-    if(!from) return fn(new Error('relation origin not found'))
-    if(!to) return fn(new Error('relation destiny not found'))
-    if(!fn || typeof fn !== 'function') fn = function() {}
+    if(!relation)
+      return fn(new Error('relation not found'))
+    if(!from)
+      return fn(new Error('relation origin not found'))
+    if(!to)
+      return fn(new Error('relation destiny not found'))
+    if(!fn || typeof fn !== 'function')
+      fn = function () {}
 
     from = get_pk(from[relation.from])
     to = get_pk(to[relation.to])
@@ -69,8 +82,10 @@ var put = function (paths, relation, model, attr) {
 
     // get the count of relations of `from`
     var on_count = function (err, value) {
-      if(err && err.type !== 'NotFoundError') return fn(err)
-      if(!err) count = value
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
+      if(!err)
+        count = value
 
       count.count += 1
 
@@ -84,8 +99,10 @@ var put = function (paths, relation, model, attr) {
 
     // check if already exists the relation
     var on_from_to = function (err, value) {
-      if(err && err.type !== 'NotFoundError') return fn(err)
-      if(!err) return fn(null, value)
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
+      if(!err)
+        return fn(null, value)
 
       model.db.get(keys.count, encoding, on_count)
     }
@@ -96,10 +113,14 @@ var put = function (paths, relation, model, attr) {
 
 var del = function (paths, relation, model, attr) {
   return function (from, to, fn) {
-    if(!relation) return fn(new Error('relation not found'))
-    if(!from) return fn(new Error('relation origin not found'))
-    if(!to) return fn(new Error('relation destiny not found'))
-    if(!fn || typeof fn !== 'function') fn = function() {}
+    if(!relation)
+      return fn(new Error('relation not found'))
+    if(!from)
+      return fn(new Error('relation origin not found'))
+    if(!to)
+      return fn(new Error('relation destiny not found'))
+    if(!fn || typeof fn !== 'function')
+      fn = function () {}
 
     from = get_pk(from[relation.from])
     to = get_pk(to[relation.to])
@@ -107,8 +128,10 @@ var del = function (paths, relation, model, attr) {
 
     // get the count of relations of `from`
     var on_count = function (err, count) {
-      if(err && err.type === 'NotFoundError') return fn() // no relations found
-      if(err && err.type !== 'NotFoundError') return fn(err)
+      if(err && err.type === 'NotFoundError')
+        return fn() // no relations found
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
 
       count.count -= 1
 
@@ -122,8 +145,10 @@ var del = function (paths, relation, model, attr) {
 
     // get the relation
     var on_from_to = function (err, rel) {
-      if(err && err.type === 'NotFoundError') return fn() // no relation found
-      if(err && err.type !== 'NotFoundError') return fn(err)
+      if(err && err.type === 'NotFoundError')
+        return fn() // no relation found
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
 
       keys = {
         from: paths.from({attr: attr, from: from, id: rel.id}),
@@ -138,16 +163,19 @@ var del = function (paths, relation, model, attr) {
   }
 }
 
-var count = function(paths, relation, model, attr) {
-  return function(from, fn) {
+var count = function (paths, relation, model, attr) {
+  return function (from, fn) {
     from = get_pk(from[relation.from])
 
     model.db.get(paths.count({
       attr: attr,
       from: from
-    }), encoding, function(err, count) {
-      if(err && err.type !== 'NotFoundError') return fn(err)
-      if(err && err.type === 'NotFoundError') return fn(err, 0) // no relation found
+    }), encoding, function (err, count) {
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
+      if(err && err.type === 'NotFoundError')
+        return fn(err, 0) // no relation found
+
       fn(err, count.count)
     })
   }

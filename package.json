@@ -1,25 +1,25 @@
 {
-  "name": "modella-relations",
+  "name": "modella-level-relations",
   "version": "0.0.1",
   "description": "levelup based modella relations",
   "keywords": ["modella", "level", "relations", "relation", "levelup"],
-  "homepage": "https://github.com/ramitos/modella-relations",
+  "homepage": "https://github.com/ramitos/modella-level-relations",
   "bugs": {
-    "url": "http://github.com/ramitos/modella-relations/issues",
+    "url": "http://github.com/ramitos/modella-level-relations/issues",
     "email": "mail@sergioramos.me"
   },
   "license": {
-    "url": "https://raw.github.com/ramitos/modella-relations/master/license",
+    "url": "https://raw.github.com/ramitos/modella-level-relations/master/license",
     "type": "MIT"
   },
   "author": "Sérgio Ramos <mail@sergioramos.me> (http://sergioramos.me)",
-  "main": "src/modella-relations.js",
+  "main": "src/relations.js",
   "directories": {
     "lib": "src"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ramitos/modella-relations.git"
+    "url": "git://github.com/ramitos/modella-level-relations.git"
   },
   "scripts": {
     "test": "make test test-coveralls"

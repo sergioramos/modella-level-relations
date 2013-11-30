@@ -160,9 +160,7 @@ module.exports = function (model) {
     from_to: path(interpolate('/relation/%s/:attr/:from/:to', model.modelName))
   }
 
-  model.relations = {}
-
-  model.on('attr', function (attr, options) {
+  var on_attr = function (attr, options) {
     if(!options || !options.is) return
     if(!model.primaryKey || !options.is.primaryKey)
       throw new Error('both ends of the relation need to have a Primary Key')
@@ -171,16 +169,24 @@ module.exports = function (model) {
       from: model.primaryKey,
       to: options.is.primaryKey
     }
-  })
+  }
 
-  model.relation = function(name) {
-    var relation = model.relations[name]
+  model.relations = {}
+
+  model.relation = function(attr) {
+    var relation = model.relations[attr]
 
     return {
-      get: get(paths, relation, model, name),
-      put: put(paths, relation, model, name),
-      del: del(paths, relation, model, name),
-      count: count(paths, relation, model, name)
+      get: get(paths, relation, model, attr),
+      put: put(paths, relation, model, attr),
+      del: del(paths, relation, model, attr),
+      count: count(paths, relation, model, attr)
     }
   }
+
+  model.on('attr', on_attr)
+
+  Object.keys(model.attrs).forEach(function (attr) {
+    on_attr(attr, model.attrs[attr])
+  })
 }

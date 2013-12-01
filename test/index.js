@@ -393,4 +393,14 @@ describe('del', function () {
 
     assert(false)
   })
+
+  it('should work with inexistent relations', function (done) {
+    User.relation('followers').del({
+      name: 'marie',
+      id: 7
+    }, {
+      name: 'seth',
+      id: 8
+    }, done)
+  })
 })

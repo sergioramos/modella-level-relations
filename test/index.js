@@ -6,10 +6,10 @@ var relations = process.env.RELATIONS_COV ? require('../lib-cov/relations') : re
     leveldown = require('leveldown'),
     type = require('type-component'),
     level = require('modella-leveldb'),
+    timehat = require('timehat'),
     assert = require('assert'),
     utils = require('./utils'),
     fs = require('fs')
-
 
 var User, location = path.join(__dirname, 'db'), users = [
   {name: 'john', id: 1},
@@ -260,6 +260,32 @@ describe('get', function () {
 
     assert(false)
   })
+
+  it('each record should have a relation id', function (done) {
+    var all = relations.filter(function (rel) {
+      return rel.from.id === 1
+    })
+
+    cursor(User.relation('followers').get({
+      id: 1
+    }, {
+      limit: 1
+    })).all(function (err, user) {
+      if(err) return done(err)
+      user = user.shift()
+
+      var now = new Date()
+
+      assert(type(user.__relation) === 'string')
+      assert(user.__relation.length > 0)
+      assert(timehat.toDate(user.__relation).getUTCMonth() === now.getUTCMonth())
+      assert(timehat.toDate(user.__relation).getUTCDate() === now.getUTCDate())
+      assert(timehat.toDate(user.__relation).getUTCHours() === now.getUTCHours())
+      assert(timehat.toDate(user.__relation).getYear() === now.getYear())
+
+      done()
+    })
+  })
 })
 
 describe('count', function () {
@@ -375,6 +401,30 @@ describe('put', function () {
 
     assert(false)
   })
+
+  it('should callback with relation', function (done) {
+    var a = {name: 'marie', id: 7}
+    var b = {name: 'seth', id: 8}
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+
+      var now = new Date()
+
+      assert(relation.to === b.id)
+      assert(relation.from === a.id)
+      assert(type(relation.id) === 'string')
+      assert(relation.count === 1)
+      assert(relation.id.length > 0)
+      assert(timehat.toDate(relation.id).getUTCMonth() === now.getUTCMonth())
+      assert(timehat.toDate(relation.id).getUTCDate() === now.getUTCDate())
+      assert(timehat.toDate(relation.id).getUTCHours() === now.getUTCHours())
+      assert(timehat.toDate(relation.id).getYear() === now.getYear())
+      assert(Object.keys(relation).length === 4)
+
+      done()
+    })
+  })
 })
 
 describe('del', function () {
@@ -422,5 +472,38 @@ describe('del', function () {
       name: 'seth',
       id: 8
     }, done)
+  })
+
+  it('should callback with 0 count when no relations exist', function (done) {
+    var a = {name: 'marie', id: 7}
+    var b = {name: 'seth', id: 8}
+
+    User.relation('followers').del(a, b, function (err, relation) {
+      if(err) return done(err)
+
+      assert(relation.count === 0)
+
+      done()
+    })
+  })
+
+
+  it('should callback with count', function (done) {
+    var a = {name: 'marie', id: 7}
+    var b = {name: 'seth', id: 8}
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+
+      assert(relation.count === 1)
+
+      User.relation('followers').del(a, b, function (err, relation) {
+        if(err) return done(err)
+
+        assert(relation.count === 0)
+
+        done()
+      })
+    })
   })
 })

@@ -80,6 +80,7 @@ var put = function (paths, relation, model, attr) {
     }
 
     var on_write = function (err) {
+      rel.count = count.count
       fn(err, rel)
     }
 
@@ -129,10 +130,23 @@ var del = function (paths, relation, model, attr) {
       from_to: paths.from_to({attr: attr, from: from, to: to})
     }
 
+    var return_count = function () {
+      count(paths, relation, model, attr)(from, function (err, count) {
+        if(err) return fn(err);
+        fn(null, {count: count})
+      })
+    }
+
+    var on_write = function (count) {
+      return function (err) {
+        fn(err, count)
+      }
+    }
+
     // get the count of relations of `from`
     var on_count = function (err, count) {
       if(err && err.type === 'NotFoundError')
-        return fn() // no relations found
+        return fn(null, {count: 0})
       if(err && err.type !== 'NotFoundError')
         return fn(err)
 
@@ -143,13 +157,13 @@ var del = function (paths, relation, model, attr) {
       .del(keys.from)
       .del(keys.from_to)
       .put(keys.count, count, encoding)
-      .write(fn)
+      .write(on_write(count))
     }
 
     // get the relation
     var on_from_to = function (err, rel) {
       if(err && err.type === 'NotFoundError')
-        return fn() // no relation found
+        return return_count()
       if(err && err.type !== 'NotFoundError')
         return fn(err)
 

@@ -127,5 +127,6 @@ User.relation('followers').del({id: 1}, {id: 2}, function (err) {})
 User.relation('followers').count({id: 1}, function (err, count) {})
 ```
 
-
 ## license
+
+MIT

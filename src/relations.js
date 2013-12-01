@@ -58,11 +58,11 @@ var get = function (paths, relation, model, attr) {
 var put = function (paths, relation, model, attr) {
   return function (from, to, fn) {
     if(!from)
-      return fn(new Error('relation origin not found'))
+      throw new Error('relation origin not defined')
     if(!to)
-      return fn(new Error('relation destiny not found'))
-    if(!fn || typeof fn !== 'function')
-      fn = function () {}
+      throw new Error('relation destiny not defined')
+    if(type(fn) !== 'function')
+      throw new Error('expected callback')
 
     from = get_pk(from[relation.from])
     to = get_pk(to[relation.to])
@@ -118,11 +118,11 @@ var put = function (paths, relation, model, attr) {
 var del = function (paths, relation, model, attr) {
   return function (from, to, fn) {
     if(!from)
-      return fn(new Error('relation origin not found'))
+      throw new Error('relation origin not defined')
     if(!to)
-      return fn(new Error('relation destiny not found'))
-    if(!fn || typeof fn !== 'function')
-      fn = function () {}
+      throw new Error('relation destiny not defined')
+    if(type(fn) !== 'function')
+      throw new Error('expected callback')
 
     from = get_pk(from[relation.from])
     to = get_pk(to[relation.to])
@@ -175,7 +175,7 @@ var count = function (paths, relation, model, attr) {
       if(err && err.type !== 'NotFoundError')
         return fn(err)
       if(err && err.type === 'NotFoundError')
-        return fn(err, 0) // no relation found
+        return fn(null, 0) // no relation found
 
       fn(err, count.count)
     })

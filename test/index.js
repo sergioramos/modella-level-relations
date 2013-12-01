@@ -128,8 +128,6 @@ describe('relation', function () {
   })
 })
 
-
-
 describe('get', function () {
   var relations = []
 
@@ -306,5 +304,93 @@ describe('count', function () {
         done()
       })
     })
+  })
+
+  it('should return 0 when no relations are found', function (done) {
+    User.relation('followers').count({
+      id: 8
+    }, function (err, count) {
+      if(err) return done(err)
+
+      assert(count === 0)
+
+      done()
+    })
+  })
+})
+
+describe('put', function () {
+  it('should throw when no origin is defined', function () {
+    try {
+      User.relation('followers').put()
+    } catch (err) {
+      return assert(err && err.message === 'relation origin not defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when no destiny is defined', function () {
+    try {
+      User.relation('followers').put({})
+    } catch (err) {
+      return assert(err && err.message === 'relation destiny not defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when no callback is defined', function () {
+    try {
+      User.relation('followers').put({
+        name: 'marie',
+        id: 7
+      }, {
+        name: 'seth',
+        id: 8
+      })
+    } catch (err) {
+      return assert(err && err.message === 'expected callback')
+    }
+
+    assert(false)
+  })
+})
+
+describe('del', function () {
+  it('should throw when no origin is defined', function () {
+    try {
+      User.relation('followers').del()
+    } catch (err) {
+      return assert(err && err.message === 'relation origin not defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when no destiny is defined', function () {
+    try {
+      User.relation('followers').del({})
+    } catch (err) {
+      return assert(err && err.message === 'relation destiny not defined')
+    }
+
+    assert(false)
+  })
+
+  it('should throw when no callback is defined', function () {
+    try {
+      User.relation('followers').del({
+        name: 'marie',
+        id: 7
+      }, {
+        name: 'seth',
+        id: 8
+      })
+    } catch (err) {
+      return assert(err && err.message === 'expected callback')
+    }
+
+    assert(false)
   })
 })

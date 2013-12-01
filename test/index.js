@@ -160,6 +160,26 @@ describe('get', function () {
     })
   })
 
+  it('should accept model', function (done) {
+    var user = User(users[0])
+    var all = relations.filter(function (rel) {
+      return rel.from.id === user.id()
+    })
+
+    cursor(User.relation('followers').get(user)).all(function (err, users) {
+      if(err) return done(err)
+
+      assert(all.length === users.length)
+      assert(all.filter(function (rel) {
+        return rel.from.id === user.id() && users.some(function (user) {
+          return user.id === rel.to.id
+        })
+      }).length === all.length)
+
+      done()
+    })
+  })
+
   it('should get first', function (done) {
     var all = relations.filter(function (rel) {
       return rel.from.id === 1

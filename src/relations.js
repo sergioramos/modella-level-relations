@@ -17,12 +17,11 @@ var default_read_opts = xtend(encoding, {
   reverse: true
 })
 
-//add count
-var get_pk = function (value) {
-  var pk = value
+var get_pk = function (model, attr) {
+  var pk = model[attr]
 
   if(typeof pk === 'function')
-    pk = value()
+    pk = model[attr]()
 
   return pk
 }
@@ -36,7 +35,7 @@ var get = function (paths, relation, model, attr) {
 
     var range = paths.from.range({
       attr: attr,
-      from: get_pk(from[relation.from]),
+      from: get_pk(from, relation.from),
       end: opts.end,
       start: opts.start,
       reverse: opts.reverse
@@ -64,8 +63,8 @@ var put = function (paths, relation, model, attr) {
     if(type(fn) !== 'function')
       throw new Error('expected callback')
 
-    from = get_pk(from[relation.from])
-    to = get_pk(to[relation.to])
+    from = get_pk(from, relation.from)
+    to = get_pk(to, relation.to)
 
     var count = {count: 0}
     var rel = {
@@ -124,8 +123,8 @@ var del = function (paths, relation, model, attr) {
     if(type(fn) !== 'function')
       throw new Error('expected callback')
 
-    from = get_pk(from[relation.from])
-    to = get_pk(to[relation.to])
+    from = get_pk(from, relation.from)
+    to = get_pk(to, relation.to)
     var keys = {
       from_to: paths.from_to({attr: attr, from: from, to: to})
     }
@@ -166,7 +165,7 @@ var del = function (paths, relation, model, attr) {
 
 var count = function (paths, relation, model, attr) {
   return function (from, fn) {
-    from = get_pk(from[relation.from])
+    from = get_pk(from, relation.from)
 
     model.db.get(paths.count({
       attr: attr,

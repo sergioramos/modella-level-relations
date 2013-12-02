@@ -15,7 +15,7 @@ npm install [--save/--save-dev] modella-level-relations
 ## example
 
 ```js
-var relations = require('./'),
+var relations = require('modella-level-relations'),
     modella = require('modella'),
     sublevel = require('sublevel'),
     store = require('level-modella'),

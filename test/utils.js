@@ -15,28 +15,31 @@ exports.save_all = function (model, objs, fn) {
 exports.generate_random_rels = function (model, objs, attr, fn) {
   var rels = []
 
-  series(exports.array(objs.length - 1, 0), function (i, fn) {
-    objs.forEach(function (user, i) {
-      var random = i
+  objs.forEach(function (from) {
+    exports.array(Math.floor(objs.length - 2)).forEach(function () {
+      var to = {
+        primary: function() {
+          return from.primary()
+        }
+      }
 
-      while(random === i) {
-        random = Math.floor(Math.random() * objs.length)
+      while(to.primary() === from.primary()) {
+        to = objs[Math.floor(Math.random() * objs.length)]
       }
 
       if(rels.some(function (rel) {
-        //console.log(rel.from)
-        return rel.from.primary() === user.primary() && rel.to.primary() === objs[random].primary()
+        return rel.from.primary() === from.primary() && rel.to.primary() === to.primary()
       })) return
 
       rels.push({
-        from: user,
-        to: objs[random]
+        from: from,
+        to: to
       })
     })
+  })
 
-    series(rels, function (rel, fn) {
-      model.relation(attr).put(rel.from, rel.to, fn)
-    }, fn)
+  series(rels, function (rel, fn) {
+    model.relation(attr).put(rel.from, rel.to, fn)
   }, function (err) {
     fn(err, rels)
   })

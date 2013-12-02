@@ -3,7 +3,8 @@ var path = require('level-path'),
     timehat = require('timehat'),
     through = require('ordered-through'),
     assertions = require('./assertions'),
-    xtend = require('xtend')
+    xtend = require('xtend'),
+    atomic = require('atomic')()
 
 var encoding = {
   keyEncoding: 'utf8',
@@ -67,9 +68,9 @@ var get = function (paths, model, attr) {
 
 var put = function (paths, model, attr) {
   return function (from, to, fn) {
-    if(assertions(model, fn)(from, to)) return // TEST
+    if(assertions(model, fn)(from, to)) return
 
-    var rel = {
+    var done, rel = {
       id: timehat(),
       from: from.primary(),
       to: to.primary(),
@@ -100,6 +101,7 @@ var put = function (paths, model, attr) {
     var on_write = function (err) {
       rel.count = count.count
       fn(err, rel)
+      done()
     }
 
     // get the count of relations of `from`
@@ -124,18 +126,21 @@ var put = function (paths, model, attr) {
       if(err && err.type !== 'NotFoundError')
         return fn(err)
       if(!err)
-        return fn(null, value)
+        return fn(new Error('relation already exists'), value)
 
       model.db.get(keys.count, encoding, on_count)
     }
 
-    model.db.get(keys.from_to, encoding, on_from_to)
+    atomic(keys.from_to, function (fn) {
+      done = fn
+      model.db.get(keys.from_to, encoding, on_from_to)
+    })
   }
 }
 
 var del = function (paths, model, attr) {
   return function (from, to, fn) {
-    if(assertions(model, fn)(from, to)) return // TEST
+    if(assertions(model, fn)(from, to)) return
 
     var keys = {
       from_to: paths.from_to({

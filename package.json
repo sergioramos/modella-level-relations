@@ -1,6 +1,6 @@
 {
   "name": "modella-level-relations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "levelup based modella relations",
   "keywords": [
     "modella",
@@ -35,7 +35,8 @@
     "ordered-through": "0.0.x",
     "timehat": "0.0.x",
     "xtend": "~2.1.1",
-    "type-component": "0.0.1"
+    "type-component": "0.0.1",
+    "atomic": "0.0.2"
   },
   "devDependencies": {
     "mocha-lcov-reporter": "0.0.x",

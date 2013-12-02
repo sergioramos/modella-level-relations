@@ -12,14 +12,15 @@ var relations = process.env.RELATIONS_COV ? require('../lib-cov/relations') : re
     assert = require('assert'),
     utils = require('./utils')
 
-var User, db, sub, users, location = path.join(__dirname, 'db')
+var User, db, sub, users, all_relations, location = path.join(__dirname, 'db')
 
-beforeEach(function (done) {
+var create_path = function (done) {
   mkdirp(location, done)
-})
+}
 
-beforeEach(function (done) {
+var create_model = function (done) {
   db = level(location, done)
+
   sub = sublevel(db)
 
   User = modella('User')
@@ -27,9 +28,9 @@ beforeEach(function (done) {
   User.use(relations)
   User.attr('id')
   User.attr('name')
-})
+}
 
-beforeEach(function (done) {
+var instantiate_models = function (done) {
   utils.save_all(User, [
     {name: 'john', id: timehat()},
     {name: 'hank', id: timehat()},
@@ -42,15 +43,30 @@ beforeEach(function (done) {
     users = values
     done()
   })
-})
+}
 
-afterEach(function (done) {
-  db.close(function () {
+var close_db = function (done) {
+  db.close(function (err) {
+    if(err) return done(err)
     leveldown.destroy(location, done)
   })
-})
+}
+
+var create_relations = function (done) {
+  utils.generate_random_rels(User, users, 'followers', function (err, relations) {
+    if(err) return done(err)
+    all_relations = relations
+    done()
+  })
+}
 
 describe('relation', function () {
+
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  after(close_db)
+
   it('should emit error when no db is defined', function (done) {
     var User = modella('User')
 
@@ -189,15 +205,12 @@ describe('relation', function () {
 })
 
 describe('get', function () {
-  var all_relations = []
 
-  beforeEach(function (done) {
-    utils.generate_random_rels(User, users, 'followers', function (err, rels) {
-      if(err) return done(err)
-      all_relations = rels
-      done()
-    })
-  })
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  before(create_relations)
+  after(close_db)
 
   it('should get all', function (done) {
     var relations = all_relations.filter(function (rel) {
@@ -334,15 +347,12 @@ describe('get', function () {
 })
 
 describe('count', function () {
-  var all_relations = []
 
-  beforeEach(function (done) {
-    utils.generate_random_rels(User, users, 'followers', function (err, rels) {
-      if(err) return done(err)
-      all_relations = rels
-      done()
-    })
-  })
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  before(create_relations)
+  after(close_db)
 
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
@@ -443,6 +453,13 @@ describe('count', function () {
 })
 
 describe('put', function () {
+
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  before(create_relations)
+  after(close_db)
+
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
       assert(err && err.message === 'expected callback');
@@ -550,9 +567,58 @@ describe('put', function () {
       done()
     })
   })
+
+  it('should callback err when relation already exixts', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'tywin'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'tyrion'
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+
+      User.relation('followers').put(a, b, function (err) {
+        assert(err && err.message === 'relation already exists')
+        done()
+      })
+    })
+  })
+
+  it('should put anatomically', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'daenerys'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'jorah'
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+    })
+
+    User.relation('followers').put(a, b, function (err) {
+      assert(err && err.message === 'relation already exists')
+      done()
+    })
+  })
 })
 
 describe('del', function () {
+
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  before(create_relations)
+  after(close_db)
+
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
       assert(err && err.message === 'expected callback');

@@ -15,39 +15,57 @@ npm install [--save/--save-dev] modella-level-relations
 ## example
 
 ```js
-var modella = require('modella'),
-    level = require('modella-leveldb')('/path/to/my/db'),
-    relations = require('modella-level-relations'),
+var relations = require('./'),
+    modella = require('modella'),
+    sublevel = require('sublevel'),
+    store = require('level-modella'),
+    level = require('level'),
+    timehat = require('timehat')
+    assert = require('assert'),
     series = require('map-series')
 
+var db = level('/tmp/relations')
+var sub = sublevel(db)
 var User = modella('User')
 
-User.use(level)
+User.use(store(sub.sublevel('users')))
 User.use(relations)
 User.attr('id')
 User.attr('name')
-User.attr('username')
-User.attr('password')
-User.attr('birthdate')
-User.attr('gender')
-User.attr('followers', {is: User})
 
+var frank = User({
+  id: timehat(),
+  name: 'frank'
+})
 
-series([
-  {name: 'ryan', id: 1},
-  {name: 'seth', id: 2}
-], function (user, fn) {
-  User(user).save(fn)
-}, function (err, users) {
+var charlie = User({
+  id: timehat(),
+  name: 'charlie'
+})
+
+series([frank, charlie], function (user, fn) {
+  user.save(fn)
+}, function (err) {
   if(err) throw err
 
-  User.relation('followers').put(users[0], users[1], function (err, relation) {
+  User.relation('followers').put(frank, charlie, function (err, relation) {
     if(err) throw err
 
-    console.log(relation) //=> {id: '142ab9de503-e195d2afc8677f8aa975abfee8f6a935', from: 1, to: 2}
+    var now = new Date()
+    assert(relation.from === frank.primary())
+    assert(relation.to === charlie.primary())
+    assert(typeof relation.id === 'string')
+    assert(relation.id.length > 0)
+    assert(timehat.toDate(relation.id).getUTCMonth() === now.getUTCMonth())
+    assert(timehat.toDate(relation.id).getUTCDate() === now.getUTCDate())
+    assert(timehat.toDate(relation.id).getUTCHours() === now.getUTCHours())
+    assert(timehat.toDate(relation.id).getYear() === now.getYear())
 
-    User.relation('followers').get(users[0]).on('data', function (user) {
-      console.log(user) //=> {name: 'seth', id: 2, __relation: '142ab9de503-e195d2afc8677f8aa975abfee8f6a935'}
+
+    User.relation('followers').get(frank).on('data', function (follower) {
+      assert(follower.name() === charlie.name())
+      assert(follower.primary() === charlie.primary())
+      assert(follower.__relation === relation.id)
     })
   })
 })
@@ -61,43 +79,20 @@ On every Model that needs relations, Model.use should be called:
 
 ```js
 var relations = require('modella-level-relations')
-var level = require('modella-leveldb')('/path/to/my/db')
+var store = require('level-modella')
+var level = require('level')('/path/to/my/db')
 
 var User = modella('User')
-User.use(level)
+User.use(store(level))
 User.use(relations)
 ```
 
-**Important**: `modella-level-relations` requires levelup as the `modella` backend.
-
-### is
-
-On every relation that has a relation needs to pass `is` to it's `attr`options:
-
-```js
-var relations = require('modella-level-relations')
-
-var User = modella('User')
-User.use(level)
-User.use(relations)
-User.attr('id')
-
-var Todo = modella('Todo')
-Todo.use(relations)
-Todo.attr('id')
-Todo.attr('author', {is: User})
-```
-
-**Important**: `modella-level-relations` requires both ends of the relation to have a primary key
+**Important**: `modella-level-relations` requires level as the `modella` backend.
 
 ### put(from, to, callback)
 
 ```js
-User.relation('followers').put({
-  id: 1
-}, {
-  id: 2
-}, function (err, relation) {})
+User.relation('followers').put(model_instance_a, model_instance_b, function (err, relation) {})
 ```
 
 ### get(from[, options])
@@ -105,7 +100,7 @@ User.relation('followers').put({
 ```js
 var cursor = require('level-cursor')
 
-cursor(User.relation('followers').get({id: 1})).each(function (follower) {}, function (err) {})
+cursor(User.relation('followers').get(model_instance_a)).each(function (follower) {}, function (err) {})
 ```
 
 #### `options`
@@ -118,13 +113,13 @@ cursor(User.relation('followers').get({id: 1})).each(function (follower) {}, fun
 ### del(from, to, callback)
 
 ```js
-User.relation('followers').del({id: 1}, {id: 2}, function (err) {})
+User.relation('followers').del(model_instance_a, model_instance_b, function (err) {})
 ```
 
 ### count(from, callback)
 
 ```js
-User.relation('followers').count({id: 1}, function (err, count) {})
+User.relation('followers').count(model_instance_a, function (err, count) {})
 ```
 
 ## license

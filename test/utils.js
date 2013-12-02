@@ -24,7 +24,8 @@ exports.generate_random_rels = function (model, objs, attr, fn) {
       }
 
       if(rels.some(function (rel) {
-        return rel.from.id === user.id && rel.to.id === objs[random].id
+        //console.log(rel.from)
+        return rel.from.primary() === user.primary() && rel.to.primary() === objs[random].primary()
       })) return
 
       rels.push({

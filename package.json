@@ -1,6 +1,6 @@
 {
   "name": "modella-level-relations",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "levelup based modella relations",
   "keywords": [
     "modella",
@@ -45,9 +45,12 @@
     "level-cursor": "0.5.x",
     "map-series": "0.0.x",
     "modella": "0.2.x",
-    "modella-leveldb": "ramitos/leveldb",
+    "level-modella": "ramitos/level-modella",
     "leveldown": "0.10.x",
-    "mkdirp": "0.3.x"
+    "mkdirp": "0.3.x",
+    "level": "0.18.x",
+    "sublevel": "2.1.x",
+    "timehat": "0.0.1"
   },
   "engines": {
     "node": ">=0.8"

@@ -25,7 +25,7 @@ var create_model = function (done) {
 
   User = modella('User')
   User.use(store(sub.sublevel('users')))
-  User.use(relations)
+  User.use(relations(sub))
   User.attr('id')
   User.attr('name')
 }
@@ -71,11 +71,11 @@ describe('relation', function () {
     var User = modella('User')
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
   })
 
   it('should emit error when db has no get method', function (done) {
@@ -88,11 +88,11 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
   })
 
   it('should emit error when db has no put method', function (done) {
@@ -105,11 +105,11 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
   })
 
   it('should emit error when db has no del method', function (done) {
@@ -122,11 +122,11 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
   })
 
   it('should emit error when db has no createValueStream method', function (done) {
@@ -139,11 +139,11 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
   })
 
   it('should emit error when db has no batch method', function (done) {
@@ -156,18 +156,114 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'model needs to have a level-based db adapter');
+      assert(err && err.message === 'expected levelup based db');
       done()
     })
 
-    User.use(relations)
+    User.use(relations(db))
+  })
+
+  it('should emit error when no db is passed', function (done) {
+    var User = modella('User')
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations({}))
+  })
+
+  it('should emit error when passed db has no get method', function (done) {
+    var User = modella('User')
+    var db = {
+      put: function() {},
+      del: function() {},
+      createValueStream: function() {},
+      batch: function() {}
+    }
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations(db))
+  })
+
+  it('should emit error when db has no put method', function (done) {
+    var User = modella('User')
+    var db = {
+      get: function() {},
+      del: function() {},
+      createValueStream: function() {},
+      batch: function() {}
+    }
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations(db))
+  })
+
+  it('should emit error when db has no del method', function (done) {
+    var User = modella('User')
+    var db = {
+      get: function() {},
+      put: function() {},
+      createValueStream: function() {},
+      batch: function() {}
+    }
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations(db))
+  })
+
+  it('should emit error when db has no createValueStream method', function (done) {
+    var User = modella('User')
+    var db = {
+      get: function() {},
+      put: function() {},
+      del: function() {},
+      batch: function() {}
+    }
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations(db))
+  })
+
+  it('should emit error when db has no batch method', function (done) {
+    var User = modella('User')
+    var db = {
+      get: function() {},
+      put: function() {},
+      del: function() {},
+      createValueStream: function() {}
+    }
+
+    User.once('error', function (err) {
+      assert(err && err.message === 'expected levelup based db');
+      done()
+    })
+
+    User.use(relations(db))
   })
 
 
   it('should emit error when relation called from model without PK', function (done) {
     var Todo = modella('Todo')
     Todo.use(store(db))
-    Todo.use(relations)
+    Todo.use(relations(db))
     Todo.attr('author')
 
     Todo.once('error', function (err) {
@@ -748,6 +844,37 @@ describe('del', function () {
       User.relation('followers').del(a, b, function (err, relation) {
         if(err) return done(err)
         assert(relation.count === 0)
+        done()
+      })
+    })
+  })
+
+  it('should del atomically', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'hodor'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'bran'
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+      assert(relation.count === 1)
+      var called = false
+
+      User.relation('followers').del(a, b, function (err, relation) {
+        if(err) return done(err)
+        called = true
+        assert(relation.count === 0)
+      })
+
+      User.relation('followers').del(a, b, function (err, relation) {
+        if(err) return done(err)
+        assert(relation.count === 0)
+        assert(called)
         done()
       })
     })

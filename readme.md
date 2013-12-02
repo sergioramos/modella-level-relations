@@ -29,7 +29,7 @@ var sub = sublevel(db)
 var User = modella('User')
 
 User.use(store(sub.sublevel('users')))
-User.use(relations)
+User.use(relations(sub.sublevel('relations')))
 User.attr('id')
 User.attr('name')
 

@@ -23,8 +23,9 @@ var levels = {}
 var count = function (paths, model, attr) {
   return function (from, fn) {
     if(assertions(model, fn)(from)) return
+    var rels_db = levels[from.model.modelName].rels_db
 
-    levels[from.model.modelName].db.get(paths.count({
+    rels_db.get(paths.count({
       attr: attr,
       from: from.primary()
     }), encoding, function (err, count) {
@@ -44,6 +45,7 @@ var get = function (paths, model, attr) {
 
     opts = xtend(default_read_opts, opts)
 
+    var rels_db = levels[from.model.modelName].rels_db
     var range = paths.from.range({
       attr: attr,
       from: from.primary(),
@@ -55,8 +57,10 @@ var get = function (paths, model, attr) {
     opts.start = range.start
     opts.end = range.end
 
-    return model.db.createValueStream(opts).pipe(through(function (rel, fn) {
-      levels[rel.modelName].db.get(rel.to, encoding, function (err, to) {
+    return rels_db.createValueStream(opts).pipe(through(function (rel, fn) {
+      var model_db = levels[rel.modelName].model_db
+
+      model_db.get(rel.to, encoding, function (err, to) {
         if(err) return fn(err)
         var instance = levels[rel.modelName].model(to)
         instance.__relation = rel.id
@@ -70,6 +74,7 @@ var put = function (paths, model, attr) {
   return function (from, to, fn) {
     if(assertions(model, fn)(from, to)) return
 
+    var rels_db = levels[from.model.modelName].rels_db
     var done, rel = {
       id: timehat(),
       from: from.primary(),
@@ -114,7 +119,7 @@ var put = function (paths, model, attr) {
       count.count += 1
 
       // add the relation
-      model.db.batch()
+      rels_db.batch()
       .put(keys.from, rel, encoding)
       .put(keys.from_to, rel, encoding)
       .put(keys.count, count, encoding)
@@ -128,12 +133,12 @@ var put = function (paths, model, attr) {
       if(!err)
         return fn(new Error('relation already exists'), value)
 
-      model.db.get(keys.count, encoding, on_count)
+      rels_db.get(keys.count, encoding, on_count)
     }
 
     atomic(keys.from_to, function (fn) {
       done = fn
-      model.db.get(keys.from_to, encoding, on_from_to)
+      rels_db.get(keys.from_to, encoding, on_from_to)
     })
   }
 }
@@ -142,7 +147,8 @@ var del = function (paths, model, attr) {
   return function (from, to, fn) {
     if(assertions(model, fn)(from, to)) return
 
-    var keys = {
+    var rels_db = levels[from.model.modelName].rels_db
+    var done, keys = {
       from_to: paths.from_to({
         attr: attr,
         from: from.primary(),
@@ -154,12 +160,14 @@ var del = function (paths, model, attr) {
       count(paths, model, attr)(from, function (err, count) {
         if(err) return fn(err);
         fn(null, {count: count})
+        done()
       })
     }
 
     var on_write = function (count) {
       return function (err) {
         fn(err, count)
+        done()
       }
     }
 
@@ -173,7 +181,7 @@ var del = function (paths, model, attr) {
       count.count -= 1
 
       // add the relation
-      model.db.batch()
+      rels_db.batch()
       .del(keys.from)
       .del(keys.from_to)
       .put(keys.count, count, encoding)
@@ -199,19 +207,23 @@ var del = function (paths, model, attr) {
         to: to.primary()
       })
 
-      model.db.get(keys.count, encoding, on_count)
+      rels_db.get(keys.count, encoding, on_count)
     }
 
-    model.db.get(keys.from_to, encoding, on_from_to)
+    atomic(keys.from_to, function (fn) {
+      done = fn
+      rels_db.get(keys.from_to, encoding, on_from_to)
+    })
   }
 }
 
-module.exports = function (model) {
-  if(assertions.db(model)) return
+var relations = function (db, model) {
+  if(assertions.db(model, {db: db})) return
 
   levels[model.modelName] = {
     model: model,
-    db: model.db
+    model_db: model.db,
+    rels_db: db
   }
 
   var paths = {
@@ -229,5 +241,11 @@ module.exports = function (model) {
       del: del(paths, model, attr),
       count: count(paths, model, attr)
     }
+  }
+}
+
+module.exports = function (db) {
+  return function (model) {
+    relations(db, model)
   }
 }

@@ -39,10 +39,12 @@ assert.models = function (emitter, fn) {
   }
 }
 
-assert.db = function (model) {
-  if(model.db && db_props.every(function (prop) {
-    return type(model.db[prop]) === 'function'
-  })) return
+assert.db = function () {
+  return Array.prototype.some.call(arguments, function (model) {
+    if(model.db && db_props.every(function (prop) {
+      return type(model.db[prop]) === 'function'
+    })) return
 
-  return model.emit('error', new Error('model needs to have a level-based db adapter'))
+    return model.emit('error', new Error('expected levelup based db'))
+  })
 }

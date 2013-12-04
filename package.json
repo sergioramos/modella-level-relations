@@ -31,12 +31,12 @@
     "test": "make test test-coveralls"
   },
   "dependencies": {
-    "level-path": "0.0.x",
+    "level-path": ">=0.0.2",
     "ordered-through": "0.0.x",
     "timehat": "0.0.x",
-    "xtend": "~2.1.1",
-    "type-component": "0.0.1",
-    "atomic": "0.0.2"
+    "xtend": "2.1.x",
+    "type-component": "0.0.x",
+    "atomic": "0.0.x"
   },
   "devDependencies": {
     "mocha-lcov-reporter": "0.0.x",
@@ -51,7 +51,7 @@
     "mkdirp": "0.3.x",
     "level": "0.18.x",
     "sublevel": "2.1.x",
-    "timehat": "0.0.1"
+    "timehat": "0.0.x"
   },
   "engines": {
     "node": ">=0.8"

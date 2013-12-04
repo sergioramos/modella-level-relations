@@ -44,19 +44,11 @@ var get = function (paths, model, attr) {
     if(assertions.models(model)(from)) return
 
     opts = xtend(default_read_opts, opts)
+    opts.from = from.primary()
+    opts.attr = attr
+    opts = paths.from.range(opts)
 
     var rels_db = levels[from.model.modelName].rels_db
-    var range = paths.from.range({
-      attr: attr,
-      from: from.primary(),
-      end: opts.end,
-      start: opts.start,
-      reverse: opts.reverse
-    })
-
-    opts.start = range.start
-    opts.end = range.end
-    //opts.reverse = !opts.reverse
 
     return rels_db.createValueStream(opts).pipe(through(function (rel, fn) {
       var model_db = levels[rel.modelName].model_db

@@ -56,6 +56,7 @@ var get = function (paths, model, attr) {
 
     opts.start = range.start
     opts.end = range.end
+    //opts.reverse = !opts.reverse
 
     return rels_db.createValueStream(opts).pipe(through(function (rel, fn) {
       var model_db = levels[rel.modelName].model_db
@@ -82,6 +83,12 @@ var put = function (paths, model, attr) {
       modelName: to.model.modelName
     }
 
+    var __fn = fn
+    fn = function() {
+      done()
+      __fn.apply(__fn, arguments)
+    }
+
     var count = {
       count: 0
     }
@@ -106,7 +113,6 @@ var put = function (paths, model, attr) {
     var on_write = function (err) {
       rel.count = count.count
       fn(err, rel)
-      done()
     }
 
     // get the count of relations of `from`
@@ -156,18 +162,22 @@ var del = function (paths, model, attr) {
       })
     }
 
+    var __fn = fn
+    fn = function() {
+      done()
+      __fn.apply(__fn, arguments)
+    }
+
     var return_count = function () {
       count(paths, model, attr)(from, function (err, count) {
         if(err) return fn(err);
         fn(null, {count: count})
-        done()
       })
     }
 
     var on_write = function (count) {
       return function (err) {
         fn(err, count)
-        done()
       }
     }
 

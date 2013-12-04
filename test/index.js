@@ -296,7 +296,7 @@ describe('relation', function () {
 
   it('should return the correct amount of methods', function () {
     var relation = User.relation('followers')
-    assert(Object.keys(relation).length === 4)
+    assert(Object.keys(relation).length === 5)
   })
 })
 
@@ -463,6 +463,38 @@ describe('get', function () {
     User.relation('followers').get.all(users[0], function (err, users) {
       if(err) return done(err)
       assert(users.length === relations.length)
+      done()
+    })
+  })
+})
+
+describe('has', function () {
+
+  before(create_path)
+  before(create_model)
+  after(close_db)
+
+  var a, b
+
+  before(function (done) {
+    a = User({id: timehat()})
+    b = User({id: timehat()})
+
+    User.relation('following').put(a, b, done)
+  })
+
+  it('it should cb true when the relation exists', function(done){
+    User.relation('following').has(a, b, function (err, has) {
+      if(err) return done(err)
+      assert(has)
+      done()
+    });
+  });
+
+  it('it should cb false when the relation doesn\'t exist', function(done){
+    User.relation('following').has(a, User({id: timehat()}), function (err, has) {
+      if(err) return done(err)
+      assert(!has)
       done()
     })
   })

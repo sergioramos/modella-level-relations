@@ -95,6 +95,12 @@ User.use(relations)
 User.relation('followers').put(model_instance_a, model_instance_b, function (err, relation) {})
 ```
 
+### has(from, to, callback)
+
+```js
+User.relation('followers').has(model_instance_a, model_instance_b, function (err, has) {})
+```
+
 ### get(from[, options])
 
 ```js

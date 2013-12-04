@@ -240,6 +240,23 @@ var del = function (paths, model, attr) {
   }
 }
 
+var has = function (paths, model, attr) {
+  return function (from, to, fn) {
+    if(assertions(model, fn)(from, to)) return
+
+    levels[from.model.modelName].rels_db.get(paths.from_to({
+      attr: attr,
+      from: from.primary(),
+      to: to.primary()
+    }), encoding, function(err){
+      if(err && err.type !== 'NotFoundError')
+        return fn(err)
+
+      fn(null, !err)
+    })
+  }
+}
+
 var relations = function (db, model) {
   if(assertions.db(model, {db: db})) return
 
@@ -262,7 +279,8 @@ var relations = function (db, model) {
       get: get(paths, model, attr),
       put: put(paths, model, attr),
       del: del(paths, model, attr),
-      count: count(paths, model, attr)
+      count: count(paths, model, attr),
+      has: has(paths, model, attr)
     }
   }
 }

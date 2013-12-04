@@ -1,6 +1,6 @@
 {
   "name": "modella-level-relations",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "levelup based modella relations",
   "keywords": [
     "modella",
@@ -36,14 +36,14 @@
     "timehat": "0.0.x",
     "xtend": "2.1.x",
     "type-component": "0.0.x",
-    "atomic": "0.0.x"
+    "atomic": "0.0.x",
+    "level-cursor": "0.5.x"
   },
   "devDependencies": {
     "mocha-lcov-reporter": "0.0.x",
     "jscoverage": "0.3.x",
     "coveralls": "2.5.x",
     "mocha": "1.14.x",
-    "level-cursor": "0.5.x",
     "map-series": "0.0.x",
     "modella": "0.2.x",
     "level-modella": "ramitos/level-modella",

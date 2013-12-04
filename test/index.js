@@ -440,6 +440,32 @@ describe('get', function () {
 
     User.relation('todos').get(Todo({}))
   })
+
+  it('should call each', function (done) {
+    var found = [], relations = all_relations.filter(function (rel) {
+      return rel.from.primary() === users[0].primary()
+    })
+
+    User.relation('followers').get.each(users[0], function(user){
+      found.push(user)
+    }, function (err) {
+      if(err) return done(err)
+      assert(found.length === relations.length)
+      done()
+    })
+  })
+
+  it('should call all', function (done) {
+    var relations = all_relations.filter(function (rel) {
+      return rel.from.primary() === users[0].primary()
+    })
+
+    User.relation('followers').get.all(users[0], function (err, users) {
+      if(err) return done(err)
+      assert(users.length === relations.length)
+      done()
+    })
+  })
 })
 
 describe('count', function () {

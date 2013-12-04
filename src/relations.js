@@ -1,8 +1,10 @@
 var path = require('level-path'),
     interpolate = require('util').format,
     timehat = require('timehat'),
+    type = require('type-component'),
     through = require('ordered-through'),
     assertions = require('./assertions'),
+    cursor = require('level-cursor'),
     xtend = require('xtend'),
     atomic = require('atomic')()
 
@@ -40,7 +42,7 @@ var count = function (paths, model, attr) {
 }
 
 var get = function (paths, model, attr) {
-  return function (from, opts) {
+  var stream = function (from, opts) {
     if(assertions.models(model)(from)) return
 
     opts = xtend(default_read_opts, opts)
@@ -61,6 +63,25 @@ var get = function (paths, model, attr) {
       })
     }))
   }
+
+  stream.each = function(from, opts, each, end){
+    if(type(opts) !== 'object') {
+      end = each
+      each = opts
+    }
+
+    return cursor(stream(from, opts)).each(each, end)
+  }
+
+  stream.all = function(from, opts, fn){
+    if(type(opts) !== 'object') {
+      fn = opts
+    }
+
+    return cursor(stream(from, opts)).all(fn)
+  }
+
+  return stream
 }
 
 var put = function (paths, model, attr) {

@@ -103,6 +103,19 @@ var cursor = require('level-cursor')
 cursor(User.relation('followers').get(model_instance_a)).each(function (follower) {}, function (err) {})
 ```
 
+### get.each(from[, options], each, end)
+
+```js
+User.relation('followers').get.each(model_instance_a, function (follower) {}, function (err) {})
+```
+
+### get.all(from[, options], each, end)
+
+```js
+User.relation('followers').get.all(model_instance_a, function (err, followers) {})
+```
+
+
 #### `options`
 
  * `start`: the relation id key you wish to start the read at.

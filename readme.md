@@ -183,7 +183,7 @@ var relations = require('modella-level-relations')
 
 // `a` -> !following -> `b`
 // `b` -> !followers -> `a`
-relations('following', 'followers').toggle(a, b, function (err, has) {})
+relations('following', 'followers').toggle(a, b, function (err, relations) {})
 ```
 
 ## license

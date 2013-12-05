@@ -4,7 +4,6 @@
 [![Build Status](https://secure.travis-ci.org/ramitos/modella-level-relations.png)](http://travis-ci.org/ramitos/modella-level-relations)
 [![Dependency Status](https://gemnasium.com/ramitos/modella-level-relations.png)](https://gemnasium.com/ramitos/modella-level-relations)
 [![Coverage Status](https://coveralls.io/repos/ramitos/modella-level-relations/badge.png?branch=master)](https://coveralls.io/r/ramitos/modella-level-relations?branch=master)
-[![Technical debt analysis](https://www.sidekickjs.com/r/ramitos/modella-level-relations/status_badge.svg)](https://www.sidekickjs.com/r/ramitos/modella-level-relations)
 
 ## install
 
@@ -29,7 +28,7 @@ var sub = sublevel(db)
 var User = modella('User')
 
 User.use(store(sub.sublevel('users')))
-User.use(relations(sub.sublevel('relations')))
+User.use(relations.plugin(sub.sublevel('relations')))
 User.attr('id')
 User.attr('name')
 
@@ -84,7 +83,7 @@ var level = require('level')('/path/to/my/db')
 
 var User = modella('User')
 User.use(store(level))
-User.use(relations)
+User.use(relations.plugin(level))
 ```
 
 **Important**: `modella-level-relations` requires level as the `modella` backend.
@@ -109,16 +108,16 @@ var cursor = require('level-cursor')
 cursor(User.relation('followers').get(model_instance_a)).each(function (follower) {}, function (err) {})
 ```
 
-### get.each(from[, options], each, end)
+### each(from[, options], each, end)
 
 ```js
-User.relation('followers').get.each(model_instance_a, function (follower) {}, function (err) {})
+User.relation('followers').each(model_instance_a, function (follower) {}, function (err) {})
 ```
 
-### get.all(from[, options], each, end)
+### all(from[, options], each, end)
 
 ```js
-User.relation('followers').get.all(model_instance_a, function (err, followers) {})
+User.relation('followers').all(model_instance_a, function (err, followers) {})
 ```
 
 
@@ -139,6 +138,52 @@ User.relation('followers').del(model_instance_a, model_instance_b, function (err
 
 ```js
 User.relation('followers').count(model_instance_a, function (err, count) {})
+```
+
+### toggle(from, to, callback)
+
+```js
+User.relation('followers').toggle(model_instance_a, function (err) {})
+```
+
+
+### relations.put(from, to, callback)
+
+```js
+var relations = require('modella-level-relations')
+
+// `a` -> following -> `b`
+// `b` -> followers -> `a`
+relations('following', 'followers').put(a, b, function (err, relations) {})
+```
+
+### relations.del(from, to, callback)
+
+```js
+var relations = require('modella-level-relations')
+
+// `a` -> !following -> `b`
+// `b` -> !followers -> `a`
+relations('following', 'followers').del(a, b, function (err, relations) {})
+```
+
+### relations.has(from, to, callback)
+
+```js
+var relations = require('modella-level-relations')
+
+// (`a` -> following -> `b`) && (`b` -> followers -> `a`)
+relations('following', 'followers').has(a, b, function (err, has) {})
+```
+
+### relations.toggle(from, to, callback)
+
+```js
+var relations = require('modella-level-relations')
+
+// `a` -> !following -> `b`
+// `b` -> !followers -> `a`
+relations('following', 'followers').toggle(a, b, function (err, has) {})
 ```
 
 ## license

@@ -294,6 +294,53 @@ describe('relation', function () {
   })
 })
 
+describe('toggle', function () {
+
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  after(close_db)
+
+  it('should toggle (by adding)', function (done) {
+    var a = users[2]
+    var b = users[3]
+
+    User.relation('following').toggle(a, b, function (err) {
+      if(err) return done(err)
+
+      User.relation('following').all(a, function (err, users) {
+        if(err) return done(err)
+        assert(users.length === 1)
+        assert(users[0].primary() === b.primary())
+        done()
+      })
+    })
+  })
+
+  it('should toggle (by removing)', function (done) {
+    var a = users[0]
+    var b = users[1]
+
+    User.relation('following').put(a, b, function (err) {
+      if(err) return done(err)
+      User.relation('following').all(a, function (err, users) {
+        if(err) return done(err)
+        assert(users.length === 1)
+        assert(users[0].primary() === b.primary())
+
+        User.relation('following').toggle(a, b, function (err) {
+          if(err) return done(err)
+          User.relation('following').all(a, function (err, users) {
+            if(err) return done(err)
+            assert(users.length === 0)
+            done()
+          })
+        })
+      })
+    })
+  })
+})
+
 describe('get', function () {
 
   before(create_path)

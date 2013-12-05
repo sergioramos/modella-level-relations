@@ -33,13 +33,13 @@ relations.prototype.put = function (from, to, fn) {
 
   function on_to (err, relation) {
     if(err) return revert(err)
-    relations.to = relation
+    relations[self.to_attr] = relation
     fn(null, relations)
   }
 
   function on_from (err, relation) {
     if(err) return fn(err)
-    relations.from = relation
+    relations[self.from_attr] = relation
 
     to.model.relation(self.to_attr).put(to, from, on_to)
   }

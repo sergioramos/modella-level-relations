@@ -933,3 +933,158 @@ describe('del', function () {
     })
   })
 })
+
+describe('relations', function () {
+  beforeEach(create_path)
+  beforeEach(create_model)
+  beforeEach(instantiate_models)
+  afterEach(close_db)
+
+  it('should put', function (done) {
+    relations('following', 'followers').put(users[0], users[1], function (err, relations) {
+      if(err) return done(err)
+
+      assert(relations.following.from === users[0].primary())
+      assert(relations.following.to === users[1].primary())
+      assert(relations.followers.from === users[1].primary())
+      assert(relations.followers.to === users[0].primary())
+
+      var called = false
+
+      User.relation('following').all(users[0], function (err, following) {
+        if(err) return done(err)
+        var user = following[0];
+
+        assert(following.length === 1)
+        assert(user.primary() === users[1].primary())
+
+        if(called) return done();
+        called = true;
+      })
+
+      User.relation('followers').all(users[1], function (err, followers) {
+        if(err) return done(err)
+        var user = followers[0];
+
+        assert(followers.length === 1)
+        assert(user.primary() === users[0].primary())
+
+        if(called) return done();
+        called = true;
+      })
+    })
+  })
+
+  it('should del', function (done) {
+    relations('following', 'followers').put(users[0], users[1], function (err) {
+      if(err) return done(err)
+
+      relations('following', 'followers').del(users[0], users[1], function (err) {
+        if(err) return done(err)
+        var called = false
+
+        User.relation('following').all(users[0], function (err, following) {
+          if(err) return done(err)
+          assert(following.length === 0)
+          if(called) return done();
+          called = true;
+        })
+
+        User.relation('followers').all(users[1], function (err, followers) {
+          if(err) return done(err)
+          assert(followers.length === 0)
+          if(called) return done();
+          called = true;
+        })
+      })
+    })
+  })
+
+  it('should toggle (by removing)', function (done) {
+    relations('following', 'followers').put(users[0], users[1], function (err) {
+      if(err) return done(err)
+
+      relations('following', 'followers').toggle(users[0], users[1], function (err) {
+        if(err) return done(err)
+        var called = false
+
+        User.relation('following').all(users[0], function (err, following) {
+          if(err) return done(err)
+          assert(following.length === 0)
+          if(called) return done();
+          called = true;
+        })
+
+        User.relation('followers').all(users[1], function (err, followers) {
+          if(err) return done(err)
+          assert(followers.length === 0)
+          if(called) return done();
+          called = true;
+        })
+      })
+    })
+  })
+
+  it('should toggle (by adding)', function (done) {
+    relations('following', 'followers').toggle(users[0], users[1], function (err) {
+      if(err) return done(err)
+      var called = false
+
+      User.relation('following').all(users[0], function (err, following) {
+        if(err) return done(err)
+        var user = following[0];
+
+        assert(following.length === 1)
+        assert(user.primary() === users[1].primary())
+
+        if(called) return done();
+        called = true;
+      })
+
+      User.relation('followers').all(users[1], function (err, followers) {
+        if(err) return done(err)
+        var user = followers[0];
+
+        assert(followers.length === 1)
+        assert(user.primary() === users[0].primary())
+
+        if(called) return done();
+        called = true;
+      })
+    })
+  })
+
+  it('should report has accurately (false)', function (done) {
+    relations('following', 'followers').has(users[0], users[1], function (err, has) {
+      if(err) return done(err)
+      assert(has === false)
+      done()
+    })
+  })
+
+  it('should report has accurately (true)', function (done) {
+    relations('following', 'followers').toggle(users[0], users[1], function (err) {
+      if(err) return done(err)
+
+      relations('following', 'followers').has(users[0], users[1], function (err, has) {
+        if(err) return done(err)
+        assert(has === true)
+        done()
+      })
+    })
+  })
+
+  it('should report inconsistency', function (done) {
+    relations('following', 'followers').toggle(users[0], users[1], function (err) {
+      if(err) return done(err)
+      User.relation('followers').del(users[1], users[0], function (err) {
+        if(err) return done(err)
+        relations('following', 'followers').has(users[0], users[1], function (err, has) {
+          assert(err)
+          assert(err.message === 'inconsistent bi-directionality')
+          done()
+        })
+      })
+    })
+  })
+})

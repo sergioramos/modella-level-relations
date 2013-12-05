@@ -218,6 +218,10 @@ relation.prototype.put = function (from, to, fn) {
   function on_write (err) {
     rel.count = count.count
     fn(err, rel)
+    if(!err) self.model.emit('relation', xtend(rel, {
+      action: 'put',
+      attr: self.attr
+    }))
   }
 
   // get the count of relations of `from`
@@ -281,6 +285,12 @@ relation.prototype.del = function (from, to, fn) {
 
   function on_write (err) {
     fn(err, count)
+    if(!err) self.model.emit('relation', {
+      action: 'del',
+      attr: self.attr,
+      from: from.primary(),
+      to: to.primary()
+    })
   }
 
   // get the count of relations of `from`

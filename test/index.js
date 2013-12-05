@@ -805,6 +805,34 @@ describe('put', function () {
       done()
     })
   })
+
+  it('should emit relation', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'daenerys'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'jorah'
+    })
+
+    User.once('relation', function (relation) {
+      assert(relation.from == a.primary())
+      assert(relation.to == b.primary())
+      assert(relation.attr == 'followers')
+      assert(relation.action == 'put')
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+    })
+
+    User.relation('followers').put(a, b, function (err) {
+      assert(err && err.message === 'relation already exists')
+      done()
+    })
+  })
 })
 
 describe('del', function () {
@@ -977,6 +1005,30 @@ describe('del', function () {
         assert(called)
         done()
       })
+    })
+  })
+
+  it('should emit relation', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'hodor'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'bran'
+    })
+
+    User.once('relation', function (relation) {
+      assert(relation.from === a.primary())
+      assert(relation.to === b.primary())
+      assert(relation.attr === 'followers')
+      assert(relation.action === 'put')
+      done()
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err);
     })
   })
 })

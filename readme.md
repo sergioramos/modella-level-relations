@@ -94,6 +94,8 @@ User.use(relations.plugin(level))
 User.relation('followers').put(model_instance_a, model_instance_b, function (err, relation) {})
 ```
 
+emits `relation` event
+
 ### has(from, to, callback)
 
 ```js
@@ -133,6 +135,8 @@ User.relation('followers').all(model_instance_a, function (err, followers) {})
 ```js
 User.relation('followers').del(model_instance_a, model_instance_b, function (err) {})
 ```
+
+emits `relation` event
 
 ### count(from, callback)
 

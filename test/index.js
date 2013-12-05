@@ -1081,7 +1081,7 @@ describe('relations', function () {
         if(err) return done(err)
         relations('following', 'followers').has(users[0], users[1], function (err, has) {
           assert(err)
-          assert(err.message === 'inconsistent bi-directionality')
+          assert(err.message === 'inconsistent dual relation')
           done()
         })
       })

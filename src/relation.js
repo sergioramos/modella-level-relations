@@ -27,7 +27,16 @@ var decorate_atomic = function (done, fn) {
   }
 }
 
-
+/**
+ * relation constructor
+ *
+ * ```javascript
+ * User.relation('todos')
+ * ```
+ *
+ * @param {model} from
+ * @api private
+ */
 var relation = module.exports = function (model, attr, db, paths) {
   if(!(this instanceof relation)) return new relation(model, attr, db, paths)
 
@@ -41,6 +50,16 @@ var relation = module.exports = function (model, attr, db, paths) {
   }
 }
 
+/**
+ * get relations count
+ *
+ * ```javascript
+ * User.relation('todos').count(user, function (err, todos_count) {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
 relation.prototype.count = function (from, fn) {
   if(assertions(this.model, fn)(from)) return
 
@@ -55,6 +74,17 @@ relation.prototype.count = function (from, fn) {
   })
 }
 
+/**
+ * check if a relation exists
+ *
+ * ```javascript
+ * User.relation('todos').has(user, todo, function (err, is_owner) {})
+ * ```
+ *
+ * @param {model} from
+ * @param {model} to
+ * @api public
+ */
 relation.prototype.has =  function (from, to, fn) {
   if(assertions(this.model, fn)(from, to)) return
 
@@ -68,6 +98,21 @@ relation.prototype.has =  function (from, to, fn) {
   })
 }
 
+/**
+ * get relations
+ *
+ * ```javascript
+ * var todos = User.relation('todos').get(user)
+ *
+ * todos.on('data', function (todo) {})
+ * todos.on('err', function (err) {})
+ * todos.on('end', function (err) {})
+ * ```
+ *
+ * @param {model} from
+ * @param {object} opts
+ * @api public
+ */
 relation.prototype.get = function (from, opts) {
   if(assertions.models(this.model)(from)) return
 
@@ -86,6 +131,16 @@ relation.prototype.get = function (from, opts) {
   }))
 }
 
+/**
+ * get each relation
+ *
+ * ```javascript
+ * User.relation('todos').each(user, function (todo) {}, function () {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
 relation.prototype.each = function (from, opts, each, end) {
   if(type(opts) !== 'object') {
     end = each
@@ -97,6 +152,16 @@ relation.prototype.each = function (from, opts, each, end) {
   return cursor(this.get(from, opts)).each(each, end)
 }
 
+/**
+ * get all relations
+ *
+ * ```javascript
+ * User.relation('todos').all(user, function (err, todos) {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
 relation.prototype.all = function (from, opts, fn) {
   if(type(opts) !== 'object') fn = opts
   if(assertions.fn(this.model, fn)) return
@@ -104,6 +169,20 @@ relation.prototype.all = function (from, opts, fn) {
   return cursor(this.get(from, opts)).all(fn)
 }
 
+/**
+ * put relation
+ *
+ * ```javascript
+ * Todo.relation('author').put(todo, user, function (err, relation) {
+ *   assert(relations.following.from === todo.primary())
+ *   assert(relations.following.to === user.primary())
+ * })
+ * ```
+ *
+ * @param {model} from
+ * @param {model} to
+ * @api public
+ */
 relation.prototype.put = function (from, to, fn) {
   if(assertions(this.model, fn)(from, to)) return
   var self = this
@@ -170,6 +249,17 @@ relation.prototype.put = function (from, to, fn) {
   })
 }
 
+/**
+ * del relation
+ *
+ * ```javascript
+ * Todo.relation('author').del(todo, user, function (err) {})
+ * ```
+ *
+ * @param {model} from
+ * @param {model} to
+ * @api public
+ */
 relation.prototype.del = function (from, to, fn) {
   if(assertions(this.model, fn)(from, to)) return
   var self = this
@@ -235,6 +325,17 @@ relation.prototype.del = function (from, to, fn) {
   })
 }
 
+/**
+ * toggle relation
+ *
+ * ```javascript
+ * Todo.relation('author').toggle(todo, user, function (err) {})
+ * ```
+ *
+ * @param {model} from
+ * @param {model} to
+ * @api public
+ */
 relation.prototype.toggle = function (from, to, fn) {
   if(assertions(this.model, fn)(from, to)) return
   var self = this
@@ -246,4 +347,8 @@ relation.prototype.toggle = function (from, to, fn) {
   })
 }
 
+/**
+ * models cache
+ * @api private
+ */
 relation.models = Object.create(null)

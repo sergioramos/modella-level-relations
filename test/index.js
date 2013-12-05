@@ -22,10 +22,9 @@ var create_model = function (done) {
   db = level(location, done)
 
   sub = sublevel(db)
-
   User = modella('User')
   User.use(store(sub.sublevel('users')))
-  User.use(relations(sub))
+  User.use(relations.plugin(sub))
   User.attr('id')
   User.attr('name')
 }
@@ -75,7 +74,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no get method', function (done) {
@@ -92,7 +91,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no put method', function (done) {
@@ -109,7 +108,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no del method', function (done) {
@@ -126,7 +125,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no createValueStream method', function (done) {
@@ -143,7 +142,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no batch method', function (done) {
@@ -160,7 +159,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when no db is passed', function (done) {
@@ -171,7 +170,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations({}))
+    User.use(relations.plugin({}))
   })
 
   it('should emit error when passed db has no get method', function (done) {
@@ -188,7 +187,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no put method', function (done) {
@@ -205,7 +204,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no del method', function (done) {
@@ -222,7 +221,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no createValueStream method', function (done) {
@@ -239,7 +238,7 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
   it('should emit error when db has no batch method', function (done) {
@@ -256,14 +255,14 @@ describe('relation', function () {
       done()
     })
 
-    User.use(relations(db))
+    User.use(relations.plugin(db))
   })
 
 
   it('should emit error when relation called from model without PK', function (done) {
     var Todo = modella('Todo')
     Todo.use(store(db))
-    Todo.use(relations(db))
+    Todo.use(relations.plugin(db))
     Todo.attr('author')
 
     Todo.once('error', function (err) {
@@ -293,11 +292,6 @@ describe('relation', function () {
     var relation = User.relation('followers')
     assert(type(relation.count) === 'function')
   })
-
-  it('should return the correct amount of methods', function () {
-    var relation = User.relation('followers')
-    assert(Object.keys(relation).length === 5)
-  })
 })
 
 describe('get', function () {
@@ -316,6 +310,7 @@ describe('get', function () {
     cursor(User.relation('followers').get(users[0])).all(function (err, followers) {
       if(err) return done(err)
       assert(relations.length === followers.length)
+
       assert(relations.filter(function (relation) {
         return relation.from.primary() === users[0].primary() && followers.some(function (follower) {
           return follower.primary() === relation.to.primary()
@@ -446,7 +441,7 @@ describe('get', function () {
       return rel.from.primary() === users[0].primary()
     })
 
-    User.relation('followers').get.each(users[0], function(user){
+    User.relation('followers').each(users[0], function(user){
       found.push(user)
     }, function (err) {
       if(err) return done(err)
@@ -460,7 +455,7 @@ describe('get', function () {
       return rel.from.primary() === users[0].primary()
     })
 
-    User.relation('followers').get.all(users[0], function (err, users) {
+    User.relation('followers').all(users[0], function (err, users) {
       if(err) return done(err)
       assert(users.length === relations.length)
       done()

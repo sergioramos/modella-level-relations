@@ -48,3 +48,11 @@ assert.db = function () {
     return model.emit('error', new Error('expected levelup based db'))
   })
 }
+
+assert.fns = function (emitter) {
+  return function () {
+    return Array.prototype.some.call(arguments, function (fn) {
+      if(type(fn) !== 'function') return dispatch(emitter, fn, new Error('model expected'))
+    })
+  }
+}

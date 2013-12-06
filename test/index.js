@@ -508,6 +508,26 @@ describe('get', function () {
       done()
     })
   })
+
+  it('should not resolve', function (done) {
+    var relations = all_relations.filter(function (rel) {
+      return rel.from.primary() === users[0].primary()
+    })
+
+    var stream = User.relation('followers').get(users[0], {resolve: false})
+
+    cursor(stream).all(function (err, followers) {
+      if(err) return done(err)
+      assert(relations.length === followers.length)
+
+      assert(relations.filter(function (relation) {
+        return relation.from.primary() === users[0].primary() && followers.some(function (follower) {
+          return follower.to === relation.to.primary() && follower.from === relation.from.primary()
+        })
+      }).length === followers.length)
+      done()
+    })
+  })
 })
 
 describe('has', function () {

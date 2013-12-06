@@ -138,6 +138,12 @@ User.relation('followers').del(model_instance_a, model_instance_b, function (err
 
 emits `relation` event
 
+### delAll(from, callback)
+
+```js
+User.relation('followers').delAll(model_instance_a, function (err) {})
+```
+
 ### count(from, callback)
 
 ```js
@@ -169,6 +175,16 @@ var relations = require('modella-level-relations')
 // `a` -> !following -> `b`
 // `b` -> !followers -> `a`
 relations('following', 'followers').del(a, b, function (err, relations) {})
+```
+
+### relations.del(from, to, callback)
+
+```js
+var relations = require('modella-level-relations')
+
+// `a` -> !following -> all
+// each -> !followers -> `a`
+relations('following', 'followers').delAll(a, function (err) {})
 ```
 
 ### relations.has(from, to, callback)

@@ -1,4 +1,6 @@
-var assertions = require('./assertions'),
+var cursor = require('level-cursor'),
+    assertions = require('./assertions'),
+    through = require('through2'),
     relation = require('./relation')
 
 /**
@@ -125,6 +127,29 @@ relations.prototype.del = function (from, to, fn) {
 
   from.model.relation(self.from_attr).del(from, to, on_from)
 }
+
+/**
+ * del açç dual relations
+ *
+ * ```javascript
+ * relations('following', 'followers').delAll(user_a, function (err) {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
+relations.prototype.delAll = function (from, fn) {
+  var self = this
+
+  function on_to(to, enc, fn){
+    self.del(from, to, fn)
+  }
+
+  var relations = from.model.relation(self.from_attr).get(from)
+  relations = relations.pipe(through({objectMode: true}, on_to))
+  cursor(relations).all(fn)
+}
+
 
 /**
  * check if a dual relation exists

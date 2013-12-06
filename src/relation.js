@@ -1,8 +1,9 @@
 var path = require('level-path'),
     timehat = require('timehat'),
     type = require('type-component'),
-    through = require('ordered-through'),
+    ordered_through = require('ordered-through'),
     assertions = require('./assertions'),
+    through = require('through2'),
     cursor = require('level-cursor'),
     xtend = require('xtend'),
     atomic = require('atomic')()
@@ -126,7 +127,7 @@ relation.prototype.get = function (from, opts) {
 
   if(!opts.resolve) return stream
 
-  return stream.pipe(through(function (rel, fn) {
+  return stream.pipe(ordered_through(function (rel, fn) {
     relation.models[rel.to_model].db.get(rel.to, encoding, function (err, to) {
       if(err) return fn(err)
       var instance = relation.models[rel.to_model](to)
@@ -338,6 +339,29 @@ relation.prototype.del = function (from, to, fn) {
     fn = decorate_atomic(done, fn)
     self.db.get(keys.from_to, encoding, on_from_to)
   })
+}
+
+/**
+ * del all relations
+ *
+ * ```javascript
+ * Todo.relation('todos').delAll(user, function (err) {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
+relation.prototype.delAll = function (from, fn) {
+  if(assertions(this.model, fn)(from)) return
+  var self = this
+
+  function on_to(to, enc, fn){
+    self.del(from, to, fn)
+  }
+
+  var relations = self.get(from)
+  relations = relations.pipe(through({objectMode: true}, on_to))
+  cursor(relations).all(fn)
 }
 
 /**

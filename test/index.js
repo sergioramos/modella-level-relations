@@ -70,7 +70,7 @@ describe('relation', function () {
     var User = modella('User')
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -87,7 +87,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -104,7 +104,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -121,7 +121,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -138,7 +138,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -155,7 +155,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -166,7 +166,7 @@ describe('relation', function () {
     var User = modella('User')
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -183,7 +183,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -200,7 +200,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -217,7 +217,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -234,7 +234,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -251,7 +251,7 @@ describe('relation', function () {
     }
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected levelup based db');
+      assert(err && err.message === 'expected levelup based db')
       done()
     })
 
@@ -266,7 +266,7 @@ describe('relation', function () {
     Todo.attr('author')
 
     Todo.once('error', function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
 
@@ -449,7 +449,7 @@ describe('get', function () {
 
   it('should emit error when argument is not a model', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
 
@@ -464,7 +464,7 @@ describe('get', function () {
     var Todo = modella('Todo')
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
 
@@ -476,7 +476,7 @@ describe('get', function () {
     Todo.attr('id')
 
     User.once('error', function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
 
@@ -550,8 +550,8 @@ describe('has', function () {
       if(err) return done(err)
       assert(has)
       done()
-    });
-  });
+    })
+  })
 
   it('it should cb false when the relation doesn\'t exist', function(done){
     User.relation('following').has(a, User({id: timehat()}), function (err, has) {
@@ -572,7 +572,7 @@ describe('count', function () {
 
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'expected callback');
+      assert(err && err.message === 'expected callback')
       done()
     })
 
@@ -586,7 +586,7 @@ describe('count', function () {
         modelName: ''
       }
     }, function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
   })
@@ -595,7 +595,7 @@ describe('count', function () {
     var Todo = modella('Todo')
 
     User.relation('todos').count(Todo({}), function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
   })
@@ -605,7 +605,7 @@ describe('count', function () {
     Todo.attr('id')
 
     User.relation('todos').count(Todo({}), function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
   })
@@ -678,7 +678,7 @@ describe('put', function () {
 
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'expected callback');
+      assert(err && err.message === 'expected callback')
       done()
     })
 
@@ -687,7 +687,7 @@ describe('put', function () {
 
   it('should emit error when args.length < 3', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'expected callback');
+      assert(err && err.message === 'expected callback')
       done()
     })
 
@@ -696,7 +696,7 @@ describe('put', function () {
 
   it('should cb error when origin is not model', function (done) {
     User.relation('followers').put(null, null, function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
   })
@@ -705,7 +705,7 @@ describe('put', function () {
     User.relation('followers').put(User({
       id: timehat()
     }), null, function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
   })
@@ -716,7 +716,7 @@ describe('put', function () {
     User.relation('followers').put(Todo({
       name: 'elias'
     }), null, function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
   })
@@ -729,7 +729,7 @@ describe('put', function () {
     }), Todo({
       name: 'elias'
     }), function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
   })
@@ -738,7 +738,7 @@ describe('put', function () {
     User.relation('followers').put(User({
       name: 'bryan'
     }), null, function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
   })
@@ -749,7 +749,7 @@ describe('put', function () {
     }), User({
       name: 'roger'
     }), function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
   })
@@ -865,7 +865,7 @@ describe('del', function () {
 
   it('should emit error when callback is not passed', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'expected callback');
+      assert(err && err.message === 'expected callback')
       done()
     })
 
@@ -874,7 +874,7 @@ describe('del', function () {
 
   it('should emit error when args.length < 3', function (done) {
     User.once('error', function (err) {
-      assert(err && err.message === 'expected callback');
+      assert(err && err.message === 'expected callback')
       done()
     })
 
@@ -883,7 +883,7 @@ describe('del', function () {
 
   it('should cb error when origin is not model', function (done) {
     User.relation('followers').put(null, null, function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
   })
@@ -892,7 +892,7 @@ describe('del', function () {
     User.relation('followers').del(User({
       id: timehat()
     }), null, function (err) {
-      assert(err && err.message === 'model expected');
+      assert(err && err.message === 'model expected')
       done()
     })
   })
@@ -903,7 +903,7 @@ describe('del', function () {
     User.relation('followers').del(Todo({
       name: 'elias'
     }), null, function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
   })
@@ -916,7 +916,7 @@ describe('del', function () {
     }), Todo({
       name: 'elias'
     }), function (err) {
-      assert(err && err.message === 'expected model with a primary key');
+      assert(err && err.message === 'expected model with a primary key')
       done()
     })
   })
@@ -925,7 +925,7 @@ describe('del', function () {
     User.relation('followers').del(User({
       name: 'bryan'
     }), null, function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
   })
@@ -936,7 +936,7 @@ describe('del', function () {
     }), User({
       name: 'roger'
     }), function (err) {
-      assert(err && err.message === 'expected model with primary key value defined');
+      assert(err && err.message === 'expected model with primary key value defined')
       done()
     })
   })
@@ -1048,7 +1048,32 @@ describe('del', function () {
     })
 
     User.relation('followers').put(a, b, function (err, relation) {
-      if(err) return done(err);
+      if(err) return done(err)
+    })
+  })
+})
+
+describe('delAll', function () {
+
+  before(create_path)
+  before(create_model)
+  before(instantiate_models)
+  before(create_relations)
+  after(close_db)
+
+  it('should del all', function (done) {
+    User.relation('followers').count(users[0], function(err, prevCount){
+      if(err) return done(err)
+      assert(prevCount > 0)
+      User.relation('followers').delAll(users[0], function(err){
+        if(err) return done(err)
+        User.relation('followers').count(users[0], function(err, count){
+          if(err) return done(err)
+          assert(prevCount > count)
+          assert(count === 0)
+          done()
+        })
+      })
     })
   })
 })
@@ -1072,26 +1097,70 @@ describe('relations', function () {
 
       User.relation('following').all(users[0], function (err, following) {
         if(err) return done(err)
-        var user = following[0];
+        var user = following[0]
 
         assert(following.length === 1)
         assert(user.primary() === users[1].primary())
 
-        if(called) return done();
-        called = true;
+        if(called) return done()
+        called = true
       })
 
       User.relation('followers').all(users[1], function (err, followers) {
         if(err) return done(err)
-        var user = followers[0];
+        var user = followers[0]
 
         assert(followers.length === 1)
         assert(user.primary() === users[0].primary())
 
-        if(called) return done();
-        called = true;
+        if(called) return done()
+        called = true
       })
     })
+  })
+
+  it('should delAll', function (done) {
+    function assert_delAll () {
+      relations('following', 'followers').has(users[0], users[1], function (err, has) {
+        if(err) return done(err)
+        assert(!has)
+        relations('following', 'followers').has(users[0], users[2], function (err, has) {
+          if(err) return done(err)
+          assert(!has)
+          done()
+        })
+      })
+    }
+    function delAll() {
+      relations('following', 'followers').delAll(users[0], function (err) {
+        if(err) return done(err)
+        assert_delAll()
+      })
+    }
+
+    function assert_put (fn) {
+      relations('following', 'followers').has(users[0], users[1], function (err, has) {
+        if(err) return done(err)
+        assert(has)
+        relations('following', 'followers').has(users[0], users[2], function (err, has) {
+          if(err) return done(err)
+          assert(has)
+          delAll()
+        })
+      })
+    }
+
+    function put (fn) {
+      relations('following', 'followers').put(users[0], users[1], function (err) {
+        if(err) return done(err)
+        relations('following', 'followers').put(users[0], users[2], function (err) {
+          if(err) return done(err)
+          assert_put()
+        })
+      })
+    }
+
+    put()
   })
 
   it('should del', function (done) {
@@ -1105,15 +1174,15 @@ describe('relations', function () {
         User.relation('following').all(users[0], function (err, following) {
           if(err) return done(err)
           assert(following.length === 0)
-          if(called) return done();
-          called = true;
+          if(called) return done()
+          called = true
         })
 
         User.relation('followers').all(users[1], function (err, followers) {
           if(err) return done(err)
           assert(followers.length === 0)
-          if(called) return done();
-          called = true;
+          if(called) return done()
+          called = true
         })
       })
     })
@@ -1130,15 +1199,15 @@ describe('relations', function () {
         User.relation('following').all(users[0], function (err, following) {
           if(err) return done(err)
           assert(following.length === 0)
-          if(called) return done();
-          called = true;
+          if(called) return done()
+          called = true
         })
 
         User.relation('followers').all(users[1], function (err, followers) {
           if(err) return done(err)
           assert(followers.length === 0)
-          if(called) return done();
-          called = true;
+          if(called) return done()
+          called = true
         })
       })
     })
@@ -1151,24 +1220,24 @@ describe('relations', function () {
 
       User.relation('following').all(users[0], function (err, following) {
         if(err) return done(err)
-        var user = following[0];
+        var user = following[0]
 
         assert(following.length === 1)
         assert(user.primary() === users[1].primary())
 
-        if(called) return done();
-        called = true;
+        if(called) return done()
+        called = true
       })
 
       User.relation('followers').all(users[1], function (err, followers) {
         if(err) return done(err)
-        var user = followers[0];
+        var user = followers[0]
 
         assert(followers.length === 1)
         assert(user.primary() === users[0].primary())
 
-        if(called) return done();
-        called = true;
+        if(called) return done()
+        called = true
       })
     })
   })

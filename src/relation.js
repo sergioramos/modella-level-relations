@@ -122,9 +122,9 @@ relation.prototype.get = function (from, opts) {
   opts = this.paths.from.range(opts)
 
   return this.db.createValueStream(opts).pipe(through(function (rel, fn) {
-    relation.models[rel.modelName].db.get(rel.to, encoding, function (err, to) {
+    relation.models[rel.to_model].db.get(rel.to, encoding, function (err, to) {
       if(err) return fn(err)
-      var instance = relation.models[rel.modelName](to)
+      var instance = relation.models[rel.to_model](to)
       instance.__relation = rel.id
       fn(null, instance)
     })
@@ -191,7 +191,7 @@ relation.prototype.put = function (from, to, fn) {
     id: timehat(),
     from: from.primary(),
     to: to.primary(),
-    modelName: to.model.modelName
+    to_model: to.model.modelName
   }
 
   var count = {

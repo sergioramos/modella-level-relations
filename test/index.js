@@ -1043,10 +1043,10 @@ describe('relations', function () {
     relations('following', 'followers').put(users[0], users[1], function (err, relations) {
       if(err) return done(err)
 
-      assert(relations.following.from === users[0].primary())
-      assert(relations.following.to === users[1].primary())
-      assert(relations.followers.from === users[1].primary())
-      assert(relations.followers.to === users[0].primary())
+      assert(relations.from.from === users[0].primary())
+      assert(relations.from.to === users[1].primary())
+      assert(relations.to.from === users[1].primary())
+      assert(relations.to.to === users[0].primary())
 
       var called = false
 

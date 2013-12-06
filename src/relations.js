@@ -72,13 +72,15 @@ relations.prototype.put = function (from, to, fn) {
 
   function on_to (err, relation) {
     if(err) return revert(err)
-    relations[self.to_attr] = relation
+    relation.attr = self.to_attr
+    relations.to = relation
     fn(null, relations)
   }
 
   function on_from (err, relation) {
     if(err) return fn(err)
-    relations[self.from_attr] = relation
+    relation.attr = self.from_attr
+    relations.from = relation
 
     to.model.relation(self.to_attr).put(to, from, on_to)
   }
@@ -108,11 +110,15 @@ relations.prototype.del = function (from, to, fn) {
 
   function on_to (err, relation) {
     if(err) return revert(err)
+    relation.attr = self.to_attr
+    relations.to = relation
     fn(null)
   }
 
   function on_from (err, relation) {
     if(err) return fn(err)
+    relation.attr = self.from_attr
+    relations.from = relation
     to.model.relation(self.to_attr).del(to, from, on_to)
   }
 

@@ -72,15 +72,15 @@ relations.prototype.put = function (from, to, fn) {
 
   function on_to (err, relation) {
     if(err) return revert(err)
-    relation.attr = self.to_attr
     relations.to = relation
+    relations.to.attr = self.to_attr
     fn(null, relations)
   }
 
   function on_from (err, relation) {
     if(err) return fn(err)
-    relation.attr = self.from_attr
     relations.from = relation
+    relations.from.attr = self.from_attr
 
     to.model.relation(self.to_attr).put(to, from, on_to)
   }
@@ -100,6 +100,7 @@ relations.prototype.put = function (from, to, fn) {
  * @api public
  */
 relations.prototype.del = function (from, to, fn) {
+  var relations = Object.create(null)
   var self = this
 
   function revert (err) {
@@ -110,15 +111,15 @@ relations.prototype.del = function (from, to, fn) {
 
   function on_to (err, relation) {
     if(err) return revert(err)
-    relation.attr = self.to_attr
     relations.to = relation
-    fn(null)
+    relations.to.attr = self.from_attr
+    fn(null, relations)
   }
 
   function on_from (err, relation) {
     if(err) return fn(err)
-    relation.attr = self.from_attr
     relations.from = relation
+    relations.from.attr = self.from_attr
     to.model.relation(self.to_attr).del(to, from, on_to)
   }
 

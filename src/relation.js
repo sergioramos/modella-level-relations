@@ -17,7 +17,8 @@ var default_read_opts = xtend(encoding, {
   start: '',
   end: '',
   limit: -1,
-  reverse: true
+  reverse: true,
+  resolve: true
 })
 
 var decorate_atomic = function (done, fn) {
@@ -121,7 +122,11 @@ relation.prototype.get = function (from, opts) {
   opts.attr = this.attr
   opts = this.paths.from.range(opts)
 
-  return this.db.createValueStream(opts).pipe(through(function (rel, fn) {
+  var stream = this.db.createValueStream(opts)
+
+  if(!opts.resolve) return stream
+
+  return stream.pipe(through(function (rel, fn) {
     relation.models[rel.to_model].db.get(rel.to, encoding, function (err, to) {
       if(err) return fn(err)
       var instance = relation.models[rel.to_model](to)

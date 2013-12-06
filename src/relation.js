@@ -154,6 +154,7 @@ relation.prototype.each = function (from, opts, each, end) {
   }
 
   if(assertions.fns(this.model)(each, end)) return
+  if(assertions(this.model, end)(from)) return
 
   return cursor(this.get(from, opts)).each(each, end)
 }
@@ -170,7 +171,7 @@ relation.prototype.each = function (from, opts, each, end) {
  */
 relation.prototype.all = function (from, opts, fn) {
   if(type(opts) !== 'object') fn = opts
-  if(assertions.fn(this.model, fn)) return
+  if(assertions(this.model, fn)(from)) return
 
   return cursor(this.get(from, opts)).all(fn)
 }

@@ -39,7 +39,7 @@ relations.plugin = function (db) {
 
     relation.models[Model.modelName] = Model
 
-    Model.relation = function (attr) {
+    Model.relation = Model.relations =function (attr) {
       if(assertions.models(Model)({model: Model})) return
       return relation(Model, attr, db)
     }

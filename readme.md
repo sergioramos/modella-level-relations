@@ -105,9 +105,7 @@ User.relation('followers').has(model_instance_a, model_instance_b, function (err
 ### get(from[, options])
 
 ```js
-var cursor = require('level-cursor')
-
-cursor(User.relation('followers').get(model_instance_a)).each(function (follower) {}, function (err) {})
+User.relation('followers').get(model_instance_a).on('data', function (follower) {})
 ```
 
 ### each(from[, options], each, end)
@@ -116,10 +114,16 @@ cursor(User.relation('followers').get(model_instance_a)).each(function (follower
 User.relation('followers').each(model_instance_a, function (follower) {}, function (err) {})
 ```
 
-### all(from[, options], each, end)
+### all(from[, options], fn)
 
 ```js
 User.relation('followers').all(model_instance_a, function (err, followers) {})
+```
+
+### one(from[, options], fn)
+
+```js
+Todo.relation('author').one(todo, function (err, author) {})
 ```
 
 
@@ -177,7 +181,7 @@ var relations = require('modella-level-relations')
 relations('following', 'followers').del(a, b, function (err, relations) {})
 ```
 
-### relations.del(from, to, callback)
+### relations.delAll(from, to, callback)
 
 ```js
 var relations = require('modella-level-relations')

@@ -177,6 +177,27 @@ relation.prototype.all = function (from, opts, fn) {
 }
 
 /**
+ * get first relation
+ *
+ * ```javascript
+ * Todo.relation('author').one(todo, function (err, author) {})
+ * ```
+ *
+ * @param {model} from
+ * @api public
+ */
+relation.prototype.one = function (from, opts, fn) {
+  if(type(opts) !== 'object') fn = opts
+  if(assertions(this.model, fn)(from)) return
+  opts.limit = 1
+
+  return cursor(this.get(from, opts)).all(function(err, tos){
+    fn(err, tos ? tos.shift() : tos)
+  })
+}
+
+
+/**
  * put relation
  *
  * ```javascript

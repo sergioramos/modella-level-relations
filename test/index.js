@@ -509,6 +509,17 @@ describe('get', function () {
     })
   })
 
+
+  it('should get one', function (done) {
+    User.relation('followers').one(users[0], function (err, user) {
+      if(err) return done(err)
+      assert(user)
+      assert(!Array.isArray(user))
+      assert(user.model.modelName === 'User')
+      done()
+    })
+  })
+
   it('should not resolve', function (done) {
     var relations = all_relations.filter(function (rel) {
       return rel.from.primary() === users[0].primary()

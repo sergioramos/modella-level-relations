@@ -114,7 +114,7 @@ relations.prototype.del = function (from, to, fn) {
   function on_to (err, relation) {
     if(err) return revert(err)
     relations.to = relation
-    relations.to.attr = self.from_attr
+    relations.to.attr = self.to_attr
     fn(null, relations)
   }
 

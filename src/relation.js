@@ -248,7 +248,8 @@ relation.prototype.put = function (from, to, fn) {
     fn(err, rel)
     if(!err) self.model.emit('relation', xtend(rel, {
       action: 'put',
-      attr: self.attr
+      attr: self.attr,
+      from_model: self.model.modelName
     }))
   }
 

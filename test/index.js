@@ -849,10 +849,14 @@ describe('put', function () {
     })
 
     User.once('relation', function (relation) {
+      assert(relation.id.length > 1)
       assert(relation.from == a.primary())
       assert(relation.to == b.primary())
       assert(relation.attr == 'followers')
       assert(relation.action == 'put')
+      assert(relation.to_model == 'User')
+      assert(relation.from_model == 'User')
+      assert(relation.count === 1)
     })
 
     User.relation('followers').put(a, b, function (err, relation) {

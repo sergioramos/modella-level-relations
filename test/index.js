@@ -856,6 +856,8 @@ describe('put', function () {
       assert(relation.action == 'put')
       assert(relation.to_model == 'User')
       assert(relation.from_model == 'User')
+      assert(relation.to_obj == b)
+      assert(relation.from_obj == a)
       assert(relation.count === 1)
     })
 
@@ -1059,6 +1061,8 @@ describe('del', function () {
       assert(relation.to === b.primary())
       assert(relation.attr === 'followers')
       assert(relation.action === 'put')
+      assert(relation.from_obj === a)
+      assert(relation.to_obj === b)
       done()
     })
 

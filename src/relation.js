@@ -249,7 +249,9 @@ relation.prototype.put = function (from, to, fn) {
     if(!err) self.model.emit('relation', xtend(rel, {
       action: 'put',
       attr: self.attr,
-      from_model: self.model.modelName
+      from_model: self.model.modelName,
+      from_obj: from,
+      to_obj: to
     }))
   }
 
@@ -318,7 +320,9 @@ relation.prototype.del = function (from, to, fn) {
       action: 'del',
       attr: self.attr,
       from: from.primary(),
-      to: to.primary()
+      to: to.primary(),
+      from_obj: from,
+      to_obj: to
     })
   }
 

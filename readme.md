@@ -94,7 +94,7 @@ User.use(relations.plugin(level))
 User.relation('followers').put(model_instance_a, model_instance_b, function (err, relation) {})
 ```
 
-emits `relation` event
+emits `pre relation` and `relation` events
 
 ### has(from, to, callback)
 

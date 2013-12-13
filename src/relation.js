@@ -222,6 +222,8 @@ relation.prototype.put = function (from, to, fn) {
     to_model: to.model.modelName
   }
 
+  self.model.emit('pre relation', rel)
+
   var count = {
     count: 0
   }

@@ -837,6 +837,34 @@ describe('put', function () {
     })
   })
 
+  it('should emit pre relation', function (done) {
+    var a = User({
+      id: timehat(),
+      name: 'daenerys'
+    })
+
+    var b = User({
+      id: timehat(),
+      name: 'jorah'
+    })
+
+    User.once('pre relation', function (relation) {
+      assert(relation.id.length > 1)
+      assert(relation.from == a.primary())
+      assert(relation.to == b.primary())
+      assert(relation.to_model == b.model.modelName)
+    })
+
+    User.relation('followers').put(a, b, function (err, relation) {
+      if(err) return done(err)
+    })
+
+    User.relation('followers').put(a, b, function (err) {
+      assert(err && err.message === 'relation already exists')
+      done()
+    })
+  })
+
   it('should emit relation', function (done) {
     var a = User({
       id: timehat(),

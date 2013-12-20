@@ -1,7 +1,8 @@
 var cursor = require('level-cursor'),
     assertions = require('./assertions'),
     through = require('through2'),
-    relation = require('./relation')
+    relation = require('./relation'),
+    type = require('type-component')
 
 /**
  * dual relation constructor
@@ -62,9 +63,14 @@ relations.plugin = function (db) {
  * @param {model} to
  * @api public
  */
-relations.prototype.put = function (from, to, fn) {
+relations.prototype.put = function (from, to, meta, fn) {
   var relations = Object.create(null)
   var self = this
+
+  if(type(meta) === 'function') {
+    fn = meta
+    meta = {}
+  }
 
   function revert (err) {
     from.model.relation(self.from_attr).del(from, to, function (rev_err) {
@@ -84,10 +90,10 @@ relations.prototype.put = function (from, to, fn) {
     relations.from = relation
     relations.from.attr = self.from_attr
 
-    to.model.relation(self.to_attr).put(to, from, on_to)
+    to.model.relation(self.to_attr).put(to, from, meta, on_to)
   }
 
-  from.model.relation(self.from_attr).put(from, to, on_from)
+  from.model.relation(self.from_attr).put(from, to, meta, on_from)
 }
 
 /**
@@ -195,12 +201,17 @@ relations.prototype.has = function (from, to, fn) {
  * @param {model} to
  * @api public
  */
-relations.prototype.toggle = function (from, to, fn) {
+relations.prototype.toggle = function (from, to, meta, fn) {
   var self = this
+
+  if(type(meta) === 'function') {
+    fn = meta
+    meta = {}
+  }
 
   self.has(from, to, function (err, has) {
     if(err) return fn(err)
     if(has) self.del(from, to, fn)
-    else self.put(from, to, fn)
+    else self.put(from, to, meta, fn)
   })
 }

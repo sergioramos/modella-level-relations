@@ -211,7 +211,12 @@ relation.prototype.one = function (from, opts, fn) {
  * @param {model} to
  * @api public
  */
-relation.prototype.put = function (from, to, fn) {
+relation.prototype.put = function (from, to, meta, fn) {
+  if(type(meta) === 'function') {
+    fn = meta
+    meta = {}
+  }
+
   if(assertions(this.model, fn)(from, to)) return
   var self = this
 
@@ -219,7 +224,8 @@ relation.prototype.put = function (from, to, fn) {
     id: timehat(),
     from: from.primary(),
     to: to.primary(),
-    to_model: to.model.modelName
+    to_model: to.model.modelName,
+    meta: meta
   }
 
   self.model.emit('pre relation', rel)
@@ -404,14 +410,19 @@ relation.prototype.delAll = function (from, fn) {
  * @param {model} to
  * @api public
  */
-relation.prototype.toggle = function (from, to, fn) {
+relation.prototype.toggle = function (from, to, meta, fn) {
+  if(type(meta) === 'function') {
+    fn = meta
+    meta = {}
+  }
+
   if(assertions(this.model, fn)(from, to)) return
   var self = this
 
   self.has(from, to, function (err, has) {
     if(err) return fn(err)
     if(has) self.del(from, to, fn);
-    else self.put(from, to, fn);
+    else self.put(from, to, meta, fn);
   })
 }
 

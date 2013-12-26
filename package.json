@@ -1,6 +1,6 @@
 {
   "name": "modella-level-relations",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "levelup based modella relations",
   "keywords": [
     "modella",
@@ -38,7 +38,7 @@
     "xtend": "2.1.x",
     "type-component": "0.0.x",
     "atomic": "0.0.x",
-    "level-cursor": "0.5.x",
+    "level-cursor": "0.6.x",
     "through2": "0.2.x"
   },
   "devDependencies": {

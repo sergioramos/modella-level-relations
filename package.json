@@ -1,6 +1,6 @@
 {
   "name": "modella-level-relations",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "levelup based modella relations",
   "keywords": [
     "modella",
@@ -32,7 +32,7 @@
     "test": "make test test-coveralls"
   },
   "dependencies": {
-    "level-path": ">=0.0.2",
+    "level-path": "0.0.2",
     "ordered-through": "0.0.x",
     "timehat": "0.0.x",
     "xtend": "2.1.x",

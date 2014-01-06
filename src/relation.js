@@ -129,7 +129,7 @@ relation.prototype.get = function (from, opts) {
 
   return stream.pipe(ordered_through(function (rel, fn) {
     relation.models[rel.to_model].db.get(rel.to, encoding, function (err, to) {
-      if(err) return fn(err)
+      if(err && err.type !== 'NotFoundError') return fn(err)
       var instance = relation.models[rel.to_model](to)
       instance.__relation = rel.id
       fn(null, instance)

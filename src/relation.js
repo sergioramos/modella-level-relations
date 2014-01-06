@@ -2,6 +2,7 @@ var path = require('level-path'),
     timehat = require('timehat'),
     type = require('type-component'),
     ordered_through = require('ordered-through'),
+    filter = require('through2-filter'),
     assertions = require('./assertions'),
     through = require('through2'),
     cursor = require('level-cursor'),
@@ -21,6 +22,10 @@ var default_read_opts = xtend(encoding, {
   reverse: true,
   resolve: true
 })
+
+var objectMode = {
+  objectMode: true
+}
 
 var decorate_atomic = function (done, fn) {
   return function () {
@@ -129,12 +134,12 @@ relation.prototype.get = function (from, opts) {
 
   return stream.pipe(ordered_through(function (rel, fn) {
     relation.models[rel.to_model].db.get(rel.to, encoding, function (err, to) {
-      if(err && err.type !== 'NotFoundError') return fn(err)
+      if(err) return fn(err.type === 'NotFoundError' ? null : err)
       var instance = relation.models[rel.to_model](to)
       instance.__relation = rel.id
       fn(null, instance)
     })
-  }))
+  })).pipe(filter(objectMode, Boolean))
 }
 
 /**
@@ -189,10 +194,16 @@ relation.prototype.all = function (from, opts, fn) {
 relation.prototype.one = function (from, opts, fn) {
   if(type(opts) !== 'object') fn = opts
   if(assertions(this.model, fn)(from)) return
-  opts.limit = 1
 
-  return cursor(this.get(from, opts)).all(function(err, tos){
-    fn(err, tos ? tos.shift() : tos)
+  var tos = this.get(from, opts)
+  var to = null
+
+  return cursor(tos).each(function(t){
+    if(to) return
+    to = t
+    tos.end()
+  }, function(err){
+    fn(err, to)
   })
 }
 
